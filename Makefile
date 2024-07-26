@@ -17,6 +17,9 @@ CXXFLAGS += --std=c++17 -fPIC
 # Compiling to dll
 LDFLAGS += -shared 
 
+# Detecting operating system (both MacOS and Linux supported)
+UNAME_S = $(shell uname -s)
+
 ifdef DEBUG
 $(info ->Debugging symbols enabled) 
     CXXFLAGS += -g
