@@ -1,0 +1,12 @@
+bin
+build
+.vscode
+
+*.pdb
+*.exe
+*.dll
+*.log
+*.lib
+*.exp
+
+*.DS_Store
