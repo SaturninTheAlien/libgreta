@@ -4,7 +4,7 @@
 
 namespace libgreta{
 
-void SaveSprite(const SpritePrototype& prototype, const std::string& filename){
+void SaveJsonSprite(const SpritePrototype& prototype, const std::string& filename){
     std::ofstream f(filename.c_str());
 
     if(!f.good()){

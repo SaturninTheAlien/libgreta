@@ -3,5 +3,6 @@
 namespace libgreta{
 
 void ExposeSpritePrototype(sol::table& t);
+void ExposeSpritesIO(sol::table& t);
 
 }

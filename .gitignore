@@ -8,5 +8,9 @@ build
 *.log
 *.lib
 *.exp
+*.so
+
+test.json
+test.lua
 
 *.DS_Store

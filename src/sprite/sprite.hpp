@@ -4,6 +4,7 @@
 #include <string>
 #include <map>
 
+#include "sprite_constants.hpp"
 #include "utils/api.hpp"
 #include "utils/types.hpp"
 #include "3rd_party/json.hpp"
@@ -84,12 +85,6 @@ public:
 
     bool    enemy     = false;
 
-    /**
-     * @brief 
-     * If true, the sprite is enemy towards any other sprite
-     */
-    bool    hostile_to_everyone   = false;
-
     int     energy        = 0;
     int     damage        = 0;
     int      damage_type = DAMAGE_IMPACT;
@@ -121,10 +116,10 @@ public:
     std::string ammo2_str;
 
 
-    SpritePrototype* transformation     = nullptr;
+    /*SpritePrototype* transformation     = nullptr;
     SpritePrototype* bonus      = nullptr;
     SpritePrototype* ammo1     = nullptr;
-    SpritePrototype* ammo2     = nullptr;
+    SpritePrototype* ammo2     = nullptr;*/
 
     bool    check_tiles = true;
     int     sound_frequency      = 22050;
@@ -153,13 +148,6 @@ public:
      * If true a sprite will be active even far from the camera
      */
     bool    always_active = false;   // 
-
-    /**
-     * @brief 
-     * If the creature sprite is ambient (like white butterflies or chain),
-     * it should not consume attacks or interact with other sprites 
-     */
-    bool    ambient = false;
 
 
     /**

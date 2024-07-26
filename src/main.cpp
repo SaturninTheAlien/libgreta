@@ -1,17 +1,30 @@
 #include "3rd_party/sol.hpp"
 #include "utils/api.hpp"
 #include "sprite/lua_sprite.hpp"
+#include <iostream>
 
 namespace libgreta{
 
-    sol::table open_libgreta(sol::this_state L) {
-		sol::state_view lua(L);
-		sol::table module = lua.create_table();
 
-        ExposeSpritePrototype(module);
+void Test(){
+	std::cout<<"Hello world from c++!"<<std::endl;
+}
 
-		return module;
-	}
+
+sol::table open_libgreta(sol::this_state L) {
+	sol::state_view lua(L);
+	sol::table module = lua.create_table();
+
+	module["Test"] = Test;
+
+	ExposeSpritePrototype(module);
+	ExposeSpritesIO(module);
+	
+
+	return module;
+}
+
+
 }
 
 extern "C" int GRETA_API luaopen_greta(lua_State* L) {
