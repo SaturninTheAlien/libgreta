@@ -85,6 +85,7 @@ void ExposeSpritePrototype(sol::table& t){
 void ExposeSpritesIO(sol::table& t){
     t["LoadJsonSprite"] = LoadJsonSprite;
     t["SaveJsonSprite"] = SaveJsonSprite;
+    t["LoadLegacySprite"] = LoadLegacySprite;
 }
 
 }
