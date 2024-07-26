@@ -1,5 +1,6 @@
 #pragma once
 
+#include "3rd_party/json.hpp"
 #include <vector>
 #include <string>
 #include <map>
@@ -7,7 +8,6 @@
 #include "sprite_constants.hpp"
 #include "utils/api.hpp"
 #include "utils/types.hpp"
-#include "3rd_party/json.hpp"
 
 #define SPRITE_ANIMATIONS_NUMBER       11
 #define SPRITE_SOUNDS_NUMBER     7

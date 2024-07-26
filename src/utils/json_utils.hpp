@@ -1,9 +1,9 @@
 #pragma once
+#include "3rd_party/json.hpp"
 #include <vector>
 #include <string>
 
 #include "types.hpp"
-#include "3rd_party/json.hpp"
 
 namespace libgreta{
 

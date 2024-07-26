@@ -7,14 +7,6 @@
 # Compiler:
 CXX = c++
 
-# Optimization:
-ifdef DEBUG
-$(info ->Debugging symbols enabled) 
-    CXXFLAGS += -g
-else
-$(info ->Release mode)
-    CXXFLAGS += -O3
-endif
 
 # Warnings:
 CXXFLAGS += -Wall
@@ -26,10 +18,16 @@ CXXFLAGS += --std=c++17 -fPIC
 LDFLAGS += -shared 
 
 ifdef DEBUG
+$(info ->Debugging symbols enabled) 
+    CXXFLAGS += -g
 	LDFLAGS += $(shell pkg-config lua --libs)
 	BIN_DIR = bin/
 else
-	LDFLAGS += -undefined dynamic_lookup
+$(info ->Release mode)
+    CXXFLAGS += -O3
+	ifeq ($(UNAME_S),Darwin)
+		LDFLAGS += -undefined dynamic_lookup
+	endif
 endif
 
 
