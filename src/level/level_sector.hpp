@@ -13,11 +13,11 @@ class Level;
 class GRETA_API LevelSector{
 public:
     LevelSector(std::size_t width, std::size_t height):
-        mWidth(width),
-        mHeight(height),
         background_tiles(width*height),
         foreground_tiles(width*height),
-        sprite_tiles(width*height)
+        sprite_tiles(width*height),
+        mWidth(width),
+        mHeight(height)
         {
 
         }
@@ -64,13 +64,16 @@ public:
     int splash_color = -1; //based on the tileset
     int fire_color_1 = 64;  //red
     int fire_color_2 = 128; //orange
-protected:
-    const std::size_t mWidth;
-    const std::size_t mHeight;
+    
+    int background_scrolling = 0;
 
     TilesArray background_tiles;
     TilesArray foreground_tiles;
     TilesArray sprite_tiles;
+
+protected:
+    const std::size_t mWidth;
+    const std::size_t mHeight;
 };
 
 }

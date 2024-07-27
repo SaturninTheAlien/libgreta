@@ -2,6 +2,7 @@
 #include "3rd_party/sol.hpp"
 #include "level.hpp"
 #include "level_sector.hpp"
+#include "level_io.hpp"
 
 namespace libgreta{
 
@@ -51,7 +52,11 @@ void ExposeLevelClasses(sol::table& t){
     "icon_id", &Level::icon_id,
 
     "lua_script", &Level::lua_script);
+}
 
+void ExposeLevelIO(sol::table& t){
+    t["LoadLevel"] = LoadLevel;
+    t["SaveLevel"] = SaveLevel;
 }
 
 }

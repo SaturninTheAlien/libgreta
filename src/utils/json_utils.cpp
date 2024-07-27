@@ -66,4 +66,24 @@ void jsonReadEnumU8(const nlohmann::json& j, const std::string& name, u8& target
 	}
 }
 
+void WriteCBOR(std::ostream& out, const nlohmann::json& j){
+	std::vector<std::uint8_t> v_cbor = nlohmann::json::to_cbor(j);
+	u64 size = v_cbor.size();
+	out.write((char*)&size, sizeof(u64));
+	out.write((char*)v_cbor.data(), size);
+}
+
+nlohmann::json ReadCBOR(std::istream& in){
+	u64 size=0;
+	in.read((char*)&size, sizeof(u64));
+
+	std::vector<std::uint8_t> v_cbor;
+	v_cbor.resize(size);
+
+	in.read((char*)v_cbor.data(), size);
+
+	return nlohmann::json::from_cbor(v_cbor);
+}
+
+
 }

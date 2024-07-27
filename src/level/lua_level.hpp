@@ -4,5 +4,6 @@
 namespace libgreta{
 
 void ExposeLevelClasses(sol::table& t);
+void ExposeLevelIO(sol::table& t);
 
 }

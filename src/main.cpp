@@ -24,6 +24,7 @@ sol::table open_libgreta(sol::this_state L) {
 	ExposeSpritesIO(module);
 
 	ExposeLevelClasses(module);	
+	ExposeLevelIO(module);
 
 	return module;
 }

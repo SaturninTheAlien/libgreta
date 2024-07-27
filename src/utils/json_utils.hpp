@@ -2,7 +2,8 @@
 #include "3rd_party/json.hpp"
 #include <vector>
 #include <string>
-
+#include <ostream>
+#include <istream>
 #include "types.hpp"
 
 namespace libgreta{
@@ -17,5 +18,8 @@ void jsonReadEnumU8(const nlohmann::json& j, const std::string& name, u8& target
 
 void jsonReadEnumU8(const nlohmann::json& j, const std::string& name, u8& target,
     const std::map<std::string, u8>& namedValues);
-    
+
+nlohmann::json ReadCBOR(std::istream& in);
+void WriteCBOR(std::ostream& out, const nlohmann::json& j);
+
 }

@@ -3,8 +3,16 @@
 #include <vector>
 #include "utils/types.hpp"
 #include "utils/api.hpp"
+#include <ostream>
+#include <istream>
 
 namespace libgreta{
+
+enum{
+    TILES_COMPRESSION_NONE = 0,
+    TILES_OFFSET_NEW = 1,
+    TILES_OFFSET_LEGACY = 2
+};
 
 class GRETA_API TilesArray{
 public:
@@ -40,6 +48,12 @@ public:
 private:
     u8* mTiles = nullptr;
     std::size_t mSize = 0;
+    friend void WriteTilesArray(std::ostream& out, const TilesArray& array, int compression);
+    friend void ReadTilesArray(std::istream& in, TilesArray& array,
+        u32 level_width,
+        u32 level_height,
+        int compression);
+
 };
 
 }
