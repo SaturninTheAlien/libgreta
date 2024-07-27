@@ -35,7 +35,7 @@ void ExposeSpritePrototype(sol::table& t){
     "immunity_type", &SpritePrototype::immunity_type,
     "score", &SpritePrototype::score,
 
-    "AI", &SpritePrototype::AI_v,
+    "ai", &SpritePrototype::AI_v,
     "max_jump", &SpritePrototype::max_jump,
     "max_speed", &SpritePrototype::max_speed,
     "charge_time", &SpritePrototype::charge_time,
