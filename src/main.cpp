@@ -1,6 +1,9 @@
 #include "3rd_party/sol.hpp"
 #include "utils/api.hpp"
+
 #include "sprite/lua_sprite.hpp"
+#include "level/lua_level.hpp"
+
 #include <iostream>
 
 namespace libgreta{
@@ -19,7 +22,8 @@ sol::table open_libgreta(sol::this_state L) {
 
 	ExposeSpritePrototype(module);
 	ExposeSpritesIO(module);
-	
+
+	ExposeLevelClasses(module);	
 
 	return module;
 }

@@ -159,11 +159,7 @@ public:
     
     bool has_dead_weight = false;
     double  dead_weight = 0;
-
-    //SpritePrototype()=default;
-    //~SpritePrototype()=default;
-
-private:
+protected:
     nlohmann::json commands_json;
        
 };
