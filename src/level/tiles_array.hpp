@@ -22,7 +22,7 @@ public:
 
     ~TilesArray();
 
-    TilesArray & operator= (TilesArray& src)=delete;
+    TilesArray & operator= (const TilesArray& src)=delete;
     TilesArray & operator= (TilesArray&& src)=delete;
 
     u8& operator[](int index){

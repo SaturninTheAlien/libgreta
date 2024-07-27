@@ -6,10 +6,40 @@
 
 namespace libgreta{
 
+static LevelSector* NewLevelSector(Level* level, std::size_t width, std::size_t height){
+    if(level==nullptr) return nullptr;
+
+    LevelSector*sector = new LevelSector(width, height);
+    level->sectors.push_back(sector);
+
+    return sector;
+}
+
+static LevelSector* CloneLevelSector(Level* level, int id){
+    id-=1; //for the lua convention
+
+    if(level==nullptr || id<0 || id>= level->sectors.size())return nullptr;
+
+    LevelSector*sector = new LevelSector(*level->sectors[id]);
+    level->sectors.push_back(sector);
+
+    return sector;
+}
+
+static void DeleteLevelSector(Level*level, int id){
+    id-=1; //for the lua convention
+    if(level==nullptr || id<0 || id>= level->sectors.size())return;
+
+    delete level->sectors[id];
+    level->sectors[id] = nullptr;
+    level->sectors.erase(level->sectors.begin() + id);    
+}
+
+
 void ExposeLevelClasses(sol::table& t){
 
     t.new_usertype<LevelSector>("LevelSector",
-
+    sol::no_constructor,
     "name", &LevelSector::name,
     "tileset", &LevelSector::tilesetName,
     "bgTileset", &LevelSector::bgTilesetName,
@@ -34,11 +64,13 @@ void ExposeLevelClasses(sol::table& t){
     "setFGTile", &LevelSector::setFGTile,
     "setSpriteTile", &LevelSector::setSpriteTile);
 
+
+
     t.new_usertype<Level>("Level",
     "name", &Level::name,
     "author", &Level::author,
 
-    //"sectors", &Level::sectors,
+    "sectors", sol::readonly(&Level::sectors),
     "spritesList", &Level::spritesList,
 
 
@@ -51,7 +83,11 @@ void ExposeLevelClasses(sol::table& t){
     "icon_y", &Level::icon_y,
     "icon_id", &Level::icon_id,
 
-    "lua_script", &Level::lua_script);
+    "lua_script", &Level::lua_script,
+    
+    "newSector", NewLevelSector,
+    "cloneSector", CloneLevelSector,
+    "deleteSector", DeleteLevelSector);
 }
 
 void ExposeLevelIO(sol::table& t){

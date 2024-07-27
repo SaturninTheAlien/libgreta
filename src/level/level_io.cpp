@@ -131,7 +131,7 @@ static Level LoadLevel15(std::istream& in){
 		throw std::runtime_error("Bad level! At least one level sector is required!");
 	}
 
-    //level.sectors.resize(sectors_number);
+    level.sectors.resize(sectors_number);
 	for(u32 i=0;i<sectors_number;++i){
 		u32 width = 0; // placeholder
 		u32 height = 0; //placeholder
@@ -143,37 +143,38 @@ static Level LoadLevel15(std::istream& in){
 		jsonReadU32(j, "height", height);
 		jsonReadU32(j, "compression", compression);
 
-        level.sectors.push_back(LevelSector(width, height));
-		LevelSector& sector = level.sectors[i];
 
-        sector.tilesetName = j["tileset"].get<std::string>();
+        LevelSector*sector = new LevelSector(width, height);
+        level.sectors[i] = sector;
+
+        sector->tilesetName = j["tileset"].get<std::string>();
 
         if(j.contains("tileset_bg") && j["tileset_bg"].is_string()){
-            sector.bgTilesetName = j["tileset_bg"].get<std::string>();
+            sector->bgTilesetName = j["tileset_bg"].get<std::string>();
         }
         else{
-            sector.bgTilesetName = "";
+            sector->bgTilesetName = "";
         }
 
-        sector.backgroundName = j["background"].get<std::string>();
+        sector->backgroundName = j["background"].get<std::string>();
 
-		jsonReadString(j, "music", sector.musicName);
-		jsonReadInt(j, "scrolling", sector.background_scrolling);
-		jsonReadInt(j, "weather", sector.weather);
+		jsonReadString(j, "music", sector->musicName);
+		jsonReadInt(j, "scrolling", sector->background_scrolling);
+		jsonReadInt(j, "weather", sector->weather);
 
-		jsonReadInt(j, "splash_color", sector.splash_color);
-		jsonReadInt(j, "fire_color_1", sector.fire_color_1);
-		jsonReadInt(j, "fire_color_2", sector.fire_color_2);
+		jsonReadInt(j, "splash_color", sector->splash_color);
+		jsonReadInt(j, "fire_color_1", sector->fire_color_1);
+		jsonReadInt(j, "fire_color_2", sector->fire_color_2);
 
 
 		// Background tiles
-        ReadTilesArray(in, sector.background_tiles, width, height, compression);
+        ReadTilesArray(in, sector->background_tiles, width, height, compression);
 
 		// Foreground tiles
-		ReadTilesArray(in, sector.foreground_tiles, width, height, compression);
+		ReadTilesArray(in, sector->foreground_tiles, width, height, compression);
 
 		// Sprite tiles
-		ReadTilesArray(in, sector.sprite_tiles, width, height, compression);
+		ReadTilesArray(in, sector->sprite_tiles, width, height, compression);
 	}
 
     return level;
@@ -232,38 +233,38 @@ void SaveLevel(const Level& level, const std::string& filename){
         WriteCBOR(f, j);
     }
 
-    for(const LevelSector& sector: level.sectors){
+    for(const LevelSector* sector: level.sectors){
 		nlohmann::json j;
 
-		j["width"] = sector.getWidth();
-		j["height"]= sector.getHeight();
+		j["width"] = sector->getWidth();
+		j["height"]= sector->getHeight();
 		j["compression"] = 0;
 
-		j["tileset"] = sector.tilesetName;
-		if(sector.bgTilesetName!=""){
-			j["tileset_bg"] = sector.bgTilesetName;
+		j["tileset"] = sector->tilesetName;
+		if(sector->bgTilesetName!=""){
+			j["tileset_bg"] = sector->bgTilesetName;
 		}
 
 		
-		j["music"] = sector.musicName;
-		j["background"] = sector.backgroundName;
-		j["scrolling"] = sector.background_scrolling;
-		j["weather"] = sector.weather;
+		j["music"] = sector->musicName;
+		j["background"] = sector->backgroundName;
+		j["scrolling"] = sector->background_scrolling;
+		j["weather"] = sector->weather;
 
-		j["splash_color"] = sector.splash_color;
-		j["fire_color_1"] = sector.fire_color_1;
-		j["fire_color_2"] = sector.fire_color_2;
+		j["splash_color"] = sector->splash_color;
+		j["fire_color_1"] = sector->fire_color_1;
+		j["fire_color_2"] = sector->fire_color_2;
 
 		WriteCBOR(f, j);
 
 		//background tiles
-        WriteTilesArray(f, sector.background_tiles, 0);
+        WriteTilesArray(f, sector->background_tiles, 0);
 
 		//foreground tiles
-        WriteTilesArray(f, sector.foreground_tiles, 0);
+        WriteTilesArray(f, sector->foreground_tiles, 0);
 
 		//sprite tiles
-        WriteTilesArray(f, sector.sprite_tiles, 0);
+        WriteTilesArray(f, sector->sprite_tiles, 0);
 	}
 
 

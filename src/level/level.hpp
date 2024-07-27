@@ -7,10 +7,17 @@ namespace libgreta{
 
 class GRETA_API Level{
 public:
-    std::string name;
-    std::string author;
+    Level();
+    ~Level();
+    Level(const Level& src);
+    Level(Level&& src);
 
-    std::vector<LevelSector> sectors;
+    Level& operator=(const Level& src) = delete;
+
+    std::string name;
+    std::string author;   
+
+    std::vector<LevelSector*> sectors;
     std::vector<std::string> spritesList;
 
     int      level_number          = 0;                            // level of the episode
@@ -24,7 +31,7 @@ public:
     int      icon_id = 0;                                        // icon id
 
     std::string lua_script = "main.lua";                        // lua script
-    int game_mode = 0;                                          // game mode
+    int game_mode = 0;                                          // game mode  
 };
 
 }
