@@ -18,7 +18,7 @@ static LevelSector* NewLevelSector(Level* level, std::size_t width, std::size_t 
 static LevelSector* CloneLevelSector(Level* level, int id){
     id-=1; //for the lua convention
 
-    if(level==nullptr || id<0 || id>= level->sectors.size())return nullptr;
+    if(level==nullptr || id<0 || id>= (int)level->sectors.size())return nullptr;
 
     LevelSector*sector = new LevelSector(*level->sectors[id]);
     level->sectors.push_back(sector);
@@ -28,7 +28,7 @@ static LevelSector* CloneLevelSector(Level* level, int id){
 
 static void DeleteLevelSector(Level*level, int id){
     id-=1; //for the lua convention
-    if(level==nullptr || id<0 || id>= level->sectors.size())return;
+    if(level==nullptr || id<0 || id>= (int)level->sectors.size())return;
 
     delete level->sectors[id];
     level->sectors[id] = nullptr;

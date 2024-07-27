@@ -1,6 +1,5 @@
 #pragma once
 
-namespace libgreta{
 
 #include <cstdint>
 
@@ -15,5 +14,3 @@ typedef int32_t s32;
 typedef int64_t s64;
 
 typedef unsigned int uint;
-
-}

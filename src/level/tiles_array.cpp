@@ -1,4 +1,5 @@
 #include "tiles_array.hpp"
+#include <cstring>
 
 namespace libgreta{
 
