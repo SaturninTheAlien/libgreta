@@ -75,7 +75,7 @@ void ExposeLevelClasses(sol::table& t){
 
 
     "level_number", &Level::level_number,
-    "map_time", &Level::map_time,
+    "time", &Level::time,
     "extra", &Level::extra,
     "player_sprite_index", &Level::player_sprite_index,
 

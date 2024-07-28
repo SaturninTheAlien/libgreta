@@ -5,6 +5,10 @@
 
 namespace libgreta{
 
+#define PK2_LEVEL_LEGACY_WIDTH  256
+#define PK2_LEVEL_LEGACY_HEIGHT 224
+#define PK2_LEVEL_LEGACY_MAX_PROTOTYPES 100
+
 class GRETA_API Level{
 public:
     Level();
@@ -21,13 +25,13 @@ public:
     std::vector<std::string> spritesList;
 
     int      level_number          = 0;                            // level of the episode
-    int      map_time           = 0;                            // map time (in (dec)conds)
+    int      time           = 0;                            // time (in (dec)conds)
     int      extra          = 0;                            // extra config - not used
 
     int      player_sprite_index = 0;                            // player prototype
 
-    int      icon_x = 0;                                         // map icon x pos
-	int      icon_y = 0;                                         // map icon x pos
+    int      icon_x = 0;                                         // icon x pos
+	int      icon_y = 0;                                         // icon x pos
     int      icon_id = 0;                                        // icon id
 
     std::string lua_script = "main.lua";                        // lua script

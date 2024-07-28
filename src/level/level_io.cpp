@@ -7,12 +7,37 @@
 namespace libgreta{
 
 
+void ReadLegacyStrInt(std::istream& in, int&val){
+	char buffer[8];
+    in.read(buffer, sizeof(buffer));
+	buffer[7] = '\0';
+
+	val = atoi(buffer);
+}
+
 static void ReadLegacyStrU32(std::istream& in, u32& val){
 	char buffer[8];
     in.read(buffer, sizeof(buffer));
 	buffer[7] = '\0';
 	val = (u32)atol(buffer);
 }
+
+
+void ReadLegacyStr13Chars(std::istream& in, std::string & val){
+	char buffer[13];
+	in.read(buffer, sizeof(buffer));
+	buffer[12] = '\0';
+	val = buffer;
+}
+
+void ReadLegacyStr40Chars(std::istream& in, std::string & val){
+	char buffer[40];
+	in.read(buffer, sizeof(buffer));
+	buffer[39] = '\0';
+	val = buffer;
+}
+
+
 
 void WriteTilesArray(std::ostream& out, const TilesArray& array, int compression){
     if(compression!=TILES_COMPRESSION_NONE){
@@ -41,11 +66,6 @@ void ReadTilesArray(std::istream& in, TilesArray& array, u32 level_width,
             ReadLegacyStrU32(in, offset_y);
             ReadLegacyStrU32(in, width);
             ReadLegacyStrU32(in, height);
-
-            in.read((char*)& offset_x, sizeof(u32));
-            in.read((char*)& offset_y, sizeof(u32));
-            in.read((char*)& width, sizeof(u32));
-            in.read((char*)& height, sizeof(u32));
 
             for (u32 y = offset_y; y <= offset_y + height; y++) {
                 u32 x_start = offset_x + y * level_width;
@@ -97,7 +117,108 @@ void ReadTilesArray(std::istream& in, TilesArray& array, u32 level_width,
 
 
 static Level LoadLevel13(std::istream& in){
-    throw std::runtime_error("Not implemented yet!");
+
+    Level level;
+
+    std::string tileset_name, background_name, music_name;
+	int weather = 0;
+	int scrolling = 0;
+
+	ReadLegacyStr13Chars(in, tileset_name);	
+	ReadLegacyStr13Chars(in, background_name);
+	ReadLegacyStr13Chars(in, music_name);
+
+
+	char name_buffer[40];
+	in.read(name_buffer, sizeof(name_buffer));
+	name_buffer[39] = '\0';
+
+	/**
+	 * @brief 
+	 * ???
+	 * What's the purpose of this??
+	 */
+	for (int i = 38; i > 0 && (name_buffer[i] == (char)0xCD); i--)
+		name_buffer[i] = 0;
+
+	level.name = name_buffer;
+
+	ReadLegacyStr40Chars(in, level.author);
+
+	ReadLegacyStrInt(in, level.level_number);
+	ReadLegacyStrInt(in, weather);
+
+    /**
+     * @brief 
+     * useless unused data
+     */
+    u32 button_time = 0; 
+	ReadLegacyStrU32(in, button_time);
+    ReadLegacyStrU32(in, button_time);
+    ReadLegacyStrU32(in, button_time);
+
+    ReadLegacyStrInt(in, level.time);
+
+	ReadLegacyStrInt(in, level.extra);
+
+	ReadLegacyStrInt(in, scrolling);
+	ReadLegacyStrInt(in, level.player_sprite_index);
+
+	ReadLegacyStrInt(in, level.icon_x);
+	ReadLegacyStrInt(in, level.icon_y);
+	ReadLegacyStrInt(in, level.icon_id);
+
+    // if(headerOnly){
+	// 	file.close();
+	// 	return;
+	// }
+
+	LevelSector* sector = new LevelSector(PK2_LEVEL_LEGACY_WIDTH, PK2_LEVEL_LEGACY_HEIGHT);
+	level.sectors.push_back(sector);
+
+	sector->backgroundName = background_name;
+	sector->tilesetName = tileset_name;
+	sector->musicName = music_name;
+
+	sector->background_scrolling = scrolling;
+	sector->weather = weather;
+
+	// sprite prototypes
+
+	u32 prototypesNumber = 0;
+	ReadLegacyStrU32(in, prototypesNumber);
+	if(prototypesNumber>PK2_LEVEL_LEGACY_MAX_PROTOTYPES){
+		std::ostringstream os;
+		os<<"Too many level sprite prototypes: "<<prototypesNumber<<std::endl;
+		os<<PK2_LEVEL_LEGACY_MAX_PROTOTYPES<<" is the limit in the \"1.3\" level format";
+		throw std::runtime_error(os.str());
+	}
+
+	char prototype_names_legacy[PK2_LEVEL_LEGACY_MAX_PROTOTYPES][13] = {""};
+	
+	in.read((char*)prototype_names_legacy, sizeof(prototype_names_legacy[0]) * prototypesNumber);
+
+	level.spritesList.resize(prototypesNumber);
+
+	for(u32 i=0;i<prototypesNumber;++i){
+		char * prototype_name = prototype_names_legacy[i];
+		prototype_name[12] = '\0';
+		level.spritesList[i] = prototype_name;
+	}
+
+	// Background tiles
+    ReadTilesArray(in, sector->background_tiles,
+        PK2_LEVEL_LEGACY_WIDTH, PK2_LEVEL_LEGACY_HEIGHT, TILES_OFFSET_LEGACY);
+
+    // Foreground tiles
+    ReadTilesArray(in, sector->foreground_tiles,
+        PK2_LEVEL_LEGACY_WIDTH, PK2_LEVEL_LEGACY_HEIGHT, TILES_OFFSET_LEGACY);
+
+    // Sprite tiles
+    ReadTilesArray(in, sector->sprite_tiles,
+        PK2_LEVEL_LEGACY_WIDTH, PK2_LEVEL_LEGACY_HEIGHT, TILES_OFFSET_LEGACY);
+
+    return level;
 }
 
 static Level LoadLevel15(std::istream& in){
@@ -122,7 +243,7 @@ static Level LoadLevel15(std::istream& in){
 		}
 
 		jsonReadInt(j, "player_index", level.player_sprite_index);
-		jsonReadInt(j, "map_time", level.map_time);
+		jsonReadInt(j, "map_time", level.time);
 		jsonReadString(j, "lua_script", level.lua_script);
 		jsonReadInt(j, "game_mode", level.game_mode);
 	}
@@ -226,7 +347,7 @@ void SaveLevel(const Level& level, const std::string& filename){
         j["player_index"] = level.player_sprite_index;
 
         j["regions"] = u32(level.sectors.size());
-        j["map_time"] = level.map_time;
+        j["map_time"] = level.time;
         j["lua_script"] = level.lua_script;
         j["game_mode"] = level.game_mode;
 

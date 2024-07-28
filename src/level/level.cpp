@@ -22,7 +22,7 @@ Level::Level(const Level& src):
     spritesList(src.spritesList),
 
     level_number(src.level_number),
-    map_time(src.map_time),
+    time(src.time),
     extra(src.extra),
     player_sprite_index(src.player_sprite_index),
     icon_x(src.icon_x),
@@ -46,7 +46,7 @@ Level::Level(Level&& src):
     spritesList(std::move(src.spritesList)),
 
     level_number(src.level_number),
-    map_time(src.map_time),
+    time(src.time),
     extra(src.extra),
     player_sprite_index(src.player_sprite_index),
     icon_x(src.icon_x),
