@@ -3,6 +3,7 @@
 
 #include "sprite/lua_sprite.hpp"
 #include "level/lua_level.hpp"
+#include "files/lua_pk2files.hpp"
 
 #include <iostream>
 
@@ -25,6 +26,8 @@ sol::table open_libgreta(sol::this_state L) {
 
 	ExposeLevelClasses(module);	
 	ExposeLevelIO(module);
+
+	ExposePK2FilesApi(module);
 
 	return module;
 }
