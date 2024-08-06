@@ -1,9 +1,9 @@
 #include "3rd_party/sol.hpp"
-#include "utils/api.hpp"
+#include "../../utils/api.hpp"
 
-#include "sprite/lua_sprite.hpp"
-#include "level/lua_level.hpp"
-#include "files/lua_pk2files.hpp"
+#include "lua_sprite.hpp"
+#include "lua_level.hpp"
+#include "lua_pk2files.hpp"
 
 #include <iostream>
 

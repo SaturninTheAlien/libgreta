@@ -1,8 +1,8 @@
 
 #include "3rd_party/sol.hpp"
-#include "level.hpp"
-#include "level_sector.hpp"
-#include "level_io.hpp"
+#include "../../level/level.hpp"
+#include "../../level/level_sector.hpp"
+#include "../../level/level_io.hpp"
 
 namespace libgreta{
 

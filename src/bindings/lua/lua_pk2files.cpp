@@ -1,5 +1,5 @@
 #include "lua_pk2files.hpp"
-#include "pk2files.hpp"
+#include "../../files/pk2files.hpp"
 #include <optional>
 
 namespace libgreta{
