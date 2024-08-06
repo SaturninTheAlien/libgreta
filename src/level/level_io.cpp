@@ -226,24 +226,26 @@ static Level LoadLevel15(std::istream& in){
     Level level;
     
     u32 sectors_number = 1;
+    u32 compression = TILES_COMPRESSION_NONE;
 
     {
 		const nlohmann::json j = ReadCBOR(in);
 		jsonReadString(j, "name", level.name);
 		jsonReadString(j, "author", level.author);
-		jsonReadInt(j, "level_number",  level.level_number);
+		jsonReadInt(j, "number",  level.level_number);
 		jsonReadInt(j, "icon_x", level.icon_x);
 		jsonReadInt(j, "icon_y", level.icon_y);
 		jsonReadInt(j, "icon_id", level.icon_id);
 
-		jsonReadU32(j, "regions", sectors_number);
+		jsonReadU32(j, "sectors", sectors_number);
+        jsonReadU32(j, "compression", compression);
 
 		if(j.contains("sprite_prototypes")){
 			level.spritesList = j["sprite_prototypes"].get<std::vector<std::string>>();
 		}
 
 		jsonReadInt(j, "player_index", level.player_sprite_index);
-		jsonReadInt(j, "map_time", level.time);
+		jsonReadInt(j, "time", level.time);
 		jsonReadString(j, "lua_script", level.lua_script);
 		jsonReadInt(j, "game_mode", level.game_mode);
 	}
@@ -256,13 +258,12 @@ static Level LoadLevel15(std::istream& in){
 	for(u32 i=0;i<sectors_number;++i){
 		u32 width = 0; // placeholder
 		u32 height = 0; //placeholder
-		u32 compression = 0;
 
 		// Read sector header
 		const nlohmann::json j = ReadCBOR(in);
 		jsonReadU32(j, "width", width);
 		jsonReadU32(j, "height", height);
-		jsonReadU32(j, "compression", compression);
+		
 
 
         LevelSector*sector = new LevelSector(width, height);
@@ -338,7 +339,7 @@ void SaveLevel(const Level& level, const std::string& filename){
         nlohmann::json j;
         j["name"] = level.name;
         j["author"] = level.author;
-        j["level_number"] = level.level_number;
+        j["number"] = level.level_number;
         j["icon_id"] = level.icon_id;
         j["icon_x"] = level.icon_x;
         j["icon_y"] = level.icon_y;
@@ -346,10 +347,11 @@ void SaveLevel(const Level& level, const std::string& filename){
         j["sprite_prototypes"] = level.spritesList;
         j["player_index"] = level.player_sprite_index;
 
-        j["regions"] = u32(level.sectors.size());
-        j["map_time"] = level.time;
+        j["sectors"] = u32(level.sectors.size());
+        j["time"] = level.time;
         j["lua_script"] = level.lua_script;
         j["game_mode"] = level.game_mode;
+        j["compression"] = 0;
 
         WriteCBOR(f, j);
     }
@@ -359,7 +361,6 @@ void SaveLevel(const Level& level, const std::string& filename){
 
 		j["width"] = sector->getWidth();
 		j["height"]= sector->getHeight();
-		j["compression"] = 0;
 
 		j["tileset"] = sector->tilesetName;
 		if(sector->bgTilesetName!=""){
