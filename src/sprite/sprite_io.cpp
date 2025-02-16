@@ -2,6 +2,7 @@
 #include "sprite_legacy.hpp"
 #include <fstream>
 #include <stdexcept>
+#include <sstream>
 
 namespace libgreta{
 
@@ -17,26 +18,10 @@ void SaveJsonSprite(const SpritePrototype& prototype, const std::string& filenam
     f.close();
 }
 
-SpritePrototype LoadJsonSprite(const std::string& filename){
-    std::ifstream f(filename);
 
-    if(!f.good()){
-        throw std::runtime_error("Cannot open a file: "+filename);
-    }
 
-    nlohmann::json j;
-    f>>j;
-    f.close();
-    
-    return SpritePrototype(j);
-}
 
-SpritePrototype LoadLegacySprite(const std::string& filename){
-    std::ifstream f(filename, std::ios::binary);
-    if(!f.good()){
-        throw std::runtime_error("Cannot open a file: "+filename);
-    }
-
+static SpritePrototype LoadLegacySprite_stream(std::istream& f){
     char version[4];
     f.read(version, 4);
     if (strcmp(version,"1.3") == 0){
@@ -63,6 +48,53 @@ SpritePrototype LoadLegacySprite(const std::string& filename){
 
     }   
     throw std::runtime_error("This is not a PK2 legacy sprite!");
+}
+
+SpritePrototype LoadSprite(const File& file){
+
+    std::string extension = file.getExtension();
+    if(extension==".spr2"){
+        return SpritePrototype(file.getContentAsJSON());
+    }
+    else if(extension==".spr"){
+        std::vector<char> buffer = file.getContent();
+        if(buffer.size() < 5){
+            throw std::runtime_error("Shit happened!");
+        }
+
+        std::string_view view(buffer.data(), buffer.size());
+        std::istringstream in(std::string(view), std::ios::binary);
+
+        return LoadLegacySprite_stream(in);
+    }
+    else{
+        std::ostringstream os;
+        os<<"Unknown sprite extension: \""<<extension<<"\"!";
+        throw std::runtime_error(os.str());
+    }
+}
+
+
+SpritePrototype LoadLegacySprite_s(const std::string& filename){
+    std::ifstream f(filename, std::ios::binary);
+    if(!f.good()){
+        throw std::runtime_error("Cannot open a file: "+filename);
+    }
+    return LoadLegacySprite_stream(f);
+}
+
+SpritePrototype LoadJsonSprite_s(const std::string& filename){
+    std::ifstream f(filename);
+
+    if(!f.good()){
+        throw std::runtime_error("Cannot open a file: "+filename);
+    }
+
+    nlohmann::json j;
+    f>>j;
+    f.close();
+    
+    return SpritePrototype(j);
 }
 
 }

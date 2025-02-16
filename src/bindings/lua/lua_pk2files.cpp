@@ -26,6 +26,9 @@ void ExposePK2FilesApi(sol::table& t){
 
     t.new_usertype<File>("File",
     "isZip", &File::isZip,
+    "getFilename", &File::getFilename,
+    "getExtension", &File::getExtension,
+    "getContent", &File::getContent,
     "getContentAsString", &File::getContentAsString,
     "__tostring", Lua_FileToStr);
 

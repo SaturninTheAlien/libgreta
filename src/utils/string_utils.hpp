@@ -5,6 +5,8 @@
 
 namespace libgreta{
 
+namespace PString{
+
 /**
  * @brief 
  * Convert a string to lowercase
@@ -25,5 +27,7 @@ GRETA_API std::string unwindowsPath(const std::string& path);
 
 GRETA_API bool endsWith(const std::string& str, const std::string& suffix);
 GRETA_API std::string removeSuffix(const std::string& str, const std::string& suffix);
+
+}
 
 }

@@ -14,6 +14,8 @@
 
 namespace libgreta{
 
+namespace PString{
+
 std::string lowercase(const std::string& src){
 
     std::string str = src;
@@ -61,6 +63,8 @@ std::string removeSuffix(const std::string& str, const std::string& suffix){
     else{
         return str;
     }
+}
+
 }
 
 }

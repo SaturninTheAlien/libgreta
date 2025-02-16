@@ -16,7 +16,7 @@ public:
     }
 
     File(PZip* zip_file, const PZipEntry&e):
-    zip_file(zip_file), zip_entry(e){
+    path(e.name), zip_file(zip_file), zip_entry(e){
 
     }
 
@@ -33,7 +33,10 @@ public:
         return this->zip_file!=nullptr;
     }
 
-    nlohmann::json getJSON()const;
+    std::string getFilename()const;
+    std::string getExtension()const;
+
+    nlohmann::json getContentAsJSON()const;
     std::string getContentAsString()const;
     std::vector<char> getContent()const;
 

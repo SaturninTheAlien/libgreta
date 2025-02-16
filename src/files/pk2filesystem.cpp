@@ -70,7 +70,7 @@ void SetEpisode(const std::string& episodeName, PZip* zip_file){
  */
 static std::optional<std::string> FindFile(const fs::path& dir, const std::string& cAsE,  const std::string& alt_extension){
     if(!fs::exists(dir) || !fs::is_directory(dir))return {};
-    std::string name_lowercase = rtrim(lowercase(cAsE));
+    std::string name_lowercase = PString::rtrim( PString::lowercase(cAsE));
 
     std::string name_lowercase_alt = "";
     if(!alt_extension.empty()){
@@ -84,7 +84,7 @@ static std::optional<std::string> FindFile(const fs::path& dir, const std::strin
         if(!entry.is_directory()){
             fs::path filename = entry.path().filename();
 
-            std::string s1 = lowercase(filename.string());
+            std::string s1 = PString::lowercase(filename.string());
             
             if(name_lowercase == s1){
 
@@ -217,7 +217,7 @@ std::vector<std::string> ScanDirectory_s(const std::string& name, const std::str
         }
         else{
             auto filename = entry.path().filename();
-            std::string extension = lowercase(filename.extension().string());
+            std::string extension = PString::lowercase(filename.extension().string());
             if(extension==filter){
                 result.push_back(filename.string());
             }

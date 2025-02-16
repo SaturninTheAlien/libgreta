@@ -61,11 +61,11 @@ void PZip::close(){
 
 std::optional<PZipEntry> PZip::getEntry(const std::string& cAsE_path, const std::string& alt_extension){
 
-	std::string lower_path = unwindowsPath(lowercase(rtrim(cAsE_path)));
+	std::string lower_path = PString::unwindowsPath(PString::lowercase(PString::rtrim(cAsE_path)));
 
 	std::string lower_path_alt="";
 	if(!alt_extension.empty()){
-		lower_path_alt= unwindowsPath(
+		lower_path_alt= PString::unwindowsPath(
 			fs::path(lower_path).replace_extension(alt_extension).string()
 		);
 	}
@@ -82,7 +82,7 @@ std::optional<PZipEntry> PZip::getEntry(const std::string& cAsE_path, const std:
 
 		std::string st_name = st.name;
 
-		std::string st_name_lower = lowercase(st_name);
+		std::string st_name_lower = PString::lowercase(st_name);
 
 		if(lower_path==st_name_lower){
 			return PZipEntry(
@@ -120,7 +120,7 @@ void PZip::read(const PZipEntry& entry, void* buffer){
 
 
 std::vector<std::string> PZip::findSubdirectories(const std::string& dirname_cAsE){
-	std::string dirname = unwindowsPath(rtrim(lowercase(dirname_cAsE)));
+	std::string dirname = PString::unwindowsPath(PString::rtrim(PString::lowercase(dirname_cAsE)));
 
 	std::vector<std::string> result;
 	
@@ -135,7 +135,7 @@ std::vector<std::string> PZip::findSubdirectories(const std::string& dirname_cAs
 
 		std::string st_name = st.name;
 
-		if(lowercase(st_name).compare(0, dirname.size(), dirname)!=0)continue;
+		if(PString::lowercase(st_name).compare(0, dirname.size(), dirname)!=0)continue;
 
 		/**
 		 * @brief 
@@ -171,7 +171,7 @@ std::vector<std::string> PZip::findSubdirectories(const std::string& dirname_cAs
 
 std::vector<PZipEntry> PZip::scanDirectory(const std::string& filename_cAsE, const std::string& filter){
 
-	std::string filename = unwindowsPath(rtrim(lowercase(filename_cAsE)));
+	std::string filename = PString::unwindowsPath(PString::rtrim(PString::lowercase(filename_cAsE)));
 
 	std::vector<PZipEntry> result;
 
@@ -185,7 +185,7 @@ std::vector<PZipEntry> PZip::scanDirectory(const std::string& filename_cAsE, con
 
 		std::string st_name = st.name;
 		
-		if(!filename.empty() && lowercase(st_name).compare(0, filename.size(), filename)!=0)continue;
+		if(!filename.empty() && PString::lowercase(st_name).compare(0, filename.size(), filename)!=0)continue;
 
 		/**
 		 * @brief 
@@ -205,7 +205,7 @@ std::vector<PZipEntry> PZip::scanDirectory(const std::string& filename_cAsE, con
 		}
 		else if(!filter.empty()){
 
-			std::string extension = lowercase(fs::path(st_name).extension().string());
+			std::string extension = PString::lowercase(fs::path(st_name).extension().string());
 			if(extension!=filter){
 				continue;
 			}

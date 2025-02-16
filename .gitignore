@@ -10,7 +10,10 @@ build
 *.exp
 *.so
 
+a.out
+
 test.json
 test.lua
+test.cpp
 
 *.DS_Store

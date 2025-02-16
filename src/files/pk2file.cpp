@@ -1,8 +1,20 @@
 #include "pk2file.hpp"
+#include "utils/string_utils.hpp"
 #include <fstream>
+#include <filesystem>
+#include <stdexcept>
+#include <sstream>
 
+namespace fs = std::filesystem;
 
 namespace libgreta{
+
+
+static void panicWhenFileNotFound(const std::string& path){
+	std::ostringstream os;
+	os<<"Cannot open the file: \""<<path<<"\"!";
+	throw std::runtime_error(os.str());
+}
 
 bool File::operator==(const File& second)const {
 	if(this->zip_file!=nullptr || second.zip_file!=nullptr){
@@ -13,7 +25,15 @@ bool File::operator==(const File& second)const {
 	}
 }
 
-nlohmann::json File::getJSON()const{
+std::string File::getFilename()const{
+	return fs::path(this->path).filename().string();
+}
+
+std::string File::getExtension()const{
+	return PString::lowercase(fs::path(this->path).extension().string());
+}
+
+nlohmann::json File::getContentAsJSON()const{
     if(this->zip_file!=nullptr && this->zip_entry.good()){
 
 		char * buffer = new char[this->zip_entry.size + 1];
@@ -27,6 +47,11 @@ nlohmann::json File::getJSON()const{
 
 	}else{
 		std::ifstream in(this->path.c_str());
+
+		if(!in.good()){
+			panicWhenFileNotFound(this->path);
+		}
+
 		nlohmann::json res = nlohmann::json::parse(in);
 		return res;
 	}
@@ -46,6 +71,11 @@ std::string File::getContentAsString()const{
 	}
 	else{
 		std::ifstream in(this->path.c_str());
+
+		if(!in.good()){
+			panicWhenFileNotFound(this->path);
+		}
+
 		return std::string((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
 	}
 }
@@ -59,6 +89,11 @@ std::vector<char> File::getContent()const{
     }
     else{
         std::ifstream in(this->path.c_str(), std::ios::binary|std::ios::ate);
+
+		if(!in.good()){
+			panicWhenFileNotFound(this->path);
+		}
+
         std::size_t size = in.tellg();
         in.seekg(0, std::ios::beg);
 
