@@ -1,21 +1,41 @@
 #!/usr/bin/env lua
 
 local greta = require("greta")
-greta.Test()
 
-local sprite = greta.LoadLegacySprite("/home/saturnin/c++/pk2_greta/res/episodes/Debug Island/sprites/flyp2.spr")
+function PigTest()
+    local sprite = greta.LoadLegacySprite(os.getenv("HOME") .. "/c++/pk2_greta/res/episodes/Debug Island/sprites/flyp2.spr")
+    print("The sprite name is: "..sprite.name)
+    for i, ai in ipairs(sprite.ai) do
+        print(i.." -> "..ai)
+    end
+    print(sprite.ammo1)
+    print(sprite.ammo2)
+    print(sprite.bonus)
+    print(sprite.transformation)
 
-print("The sprite name is: "..sprite.name)
+    print(sprite.attack1_offset)
+    print(sprite.attack2_offset)
 
-for i, ai in ipairs(sprite.ai) do
-    print(i.." -> "..ai)
+    --print(sprite.)
+
+    greta.SaveJsonSprite(sprite, "test.json")
 end
 
-print(sprite.ammo1)
-print(sprite.ammo2)
+function DinoTest()
+    local sprite = greta.LoadJsonSprite("dino.spr2")
 
-print(sprite.bonus)
+    print(sprite.ammo1)
+    print(sprite.ammo2)
+    print(sprite.bonus)
+    print(sprite.transformation)
+    print(sprite.attack1_offset)
+    print(sprite.attack2_offset)
 
-print(sprite.transformation)
+    greta.SaveJsonSprite(sprite, "test.json")
+end
 
-greta.SaveJsonSprite(sprite, "test.json")
+if debug.getinfo(1).what=="main" then
+    greta.Test()
+    PigTest()
+    DinoTest()
+end

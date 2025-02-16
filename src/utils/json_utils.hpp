@@ -22,4 +22,8 @@ void jsonReadEnumU8(const nlohmann::json& j, const std::string& name, u8& target
 nlohmann::json ReadCBOR(std::istream& in);
 void WriteCBOR(std::ostream& out, const nlohmann::json& j);
 
+void to_json(nlohmann::json& j, const Point2D&p);
+void from_json(const nlohmann::json& j, Point2D&p);
+
+
 }

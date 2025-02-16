@@ -474,6 +474,14 @@ SpritePrototype::SpritePrototype(const nlohmann::json& j){
 		this->has_dead_weight = true;
 		this->dead_weight = j["dead_weight"].get<double>();
 	}
+
+	if(j.contains("attack1_offset") && !j["attack1_offset"].is_null()){
+		this->attack1_offset = j["attack1_offset"].get<Point2D>();
+	}
+
+	if(j.contains("attack2_offset") && !j["attack2_offset"].is_null()){
+		this->attack2_offset = j["attack2_offset"].get<Point2D>();
+	}
 }
 
 void to_json(nlohmann::json& j, const SpritePrototype& c){
@@ -579,6 +587,15 @@ void to_json(nlohmann::json& j, const SpritePrototype& c){
 	}
 	if(c.has_dead_weight){
 		j["dead_weight"] = c.dead_weight;
+	}
+
+
+	if(c.attack1_offset.has_value()){
+		j["attack1_offset"] = *c.attack1_offset;
+	}
+
+	if(c.attack2_offset.has_value()){
+		j["attack2_offset"] = *c.attack2_offset;
 	}
 }
 

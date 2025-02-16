@@ -1,6 +1,7 @@
 #pragma once
 
 #include "3rd_party/json.hpp"
+#include <optional>
 #include <vector>
 #include <string>
 #include <map>
@@ -115,11 +116,14 @@ public:
     std::string ammo1_str;
     std::string ammo2_str;
 
+    std::optional<Point2D> attack1_offset;
+    std::optional<Point2D> attack2_offset;
 
-    /*SpritePrototype* transformation     = nullptr;
-    SpritePrototype* bonus      = nullptr;
-    SpritePrototype* ammo1     = nullptr;
-    SpritePrototype* ammo2     = nullptr;*/
+
+    SpritePrototype* transformation_p     = nullptr;
+    SpritePrototype* bonus_p      = nullptr;
+    SpritePrototype* ammo1_p     = nullptr;
+    SpritePrototype* ammo2_p     = nullptr;
 
     bool    check_tiles = true;
     int     sound_frequency      = 22050;

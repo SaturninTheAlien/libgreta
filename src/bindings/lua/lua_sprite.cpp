@@ -78,8 +78,14 @@ void ExposeSpritePrototype(sol::table& t){
     "info_id", &SpritePrototype::info_id,
     "always_active", &SpritePrototype::always_active,
     "has_dead_weight", &SpritePrototype::has_dead_weight,
-    "dead_weight", &SpritePrototype::dead_weight);
+    "dead_weight", &SpritePrototype::dead_weight,
+    "attack1_offset", &SpritePrototype::attack1_offset,
+    "attack2_offset", &SpritePrototype::attack2_offset,
 
+    "transformation_p", &SpritePrototype::transformation_p,
+    "bonus_p", &SpritePrototype::bonus_p,
+    "ammo1_p", &SpritePrototype::ammo1_p,
+    "ammo2_p", &SpritePrototype::ammo2_p);
 }
 
 void ExposeSpritesIO(sol::table& t){

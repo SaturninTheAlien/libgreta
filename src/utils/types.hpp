@@ -1,5 +1,8 @@
+//#########################
+//Pekka Kana 2
+//Copyright (c) 2003 Janne Kivilahti
+//#########################
 #pragma once
-
 
 #include <cstdint>
 
@@ -14,3 +17,17 @@ typedef int32_t s32;
 typedef int64_t s64;
 
 typedef unsigned int uint;
+
+
+namespace libgreta{
+
+class Point2D{
+public:
+    Point2D()=default;
+    Point2D(double x, double y):x(x), y(y){
+    }
+    double x = 0;
+    double y = 0;
+};
+
+}

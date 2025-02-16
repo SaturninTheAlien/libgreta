@@ -1,6 +1,7 @@
 #include "3rd_party/sol.hpp"
 #include "../../utils/api.hpp"
 
+#include "lua_misc.hpp"
 #include "lua_sprite.hpp"
 #include "lua_level.hpp"
 #include "lua_pk2files.hpp"
@@ -21,12 +22,11 @@ sol::table open_libgreta(sol::this_state L) {
 
 	module["Test"] = Test;
 
+	ExposeUtils(module);
 	ExposeSpritePrototype(module);
 	ExposeSpritesIO(module);
-
 	ExposeLevelClasses(module);	
 	ExposeLevelIO(module);
-
 	ExposePK2FilesApi(module);
 
 	return module;
