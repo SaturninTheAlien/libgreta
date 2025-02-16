@@ -91,8 +91,8 @@ void ExposeLevelClasses(sol::table& t){
 }
 
 void ExposeLevelIO(sol::table& t){
-    t["LoadLevel"] = LoadLevel;
-    t["SaveLevel"] = SaveLevel;
+    t["loadLevel"] = LoadLevel;
+    t["saveLevel"] = SaveLevel;
 }
 
 }

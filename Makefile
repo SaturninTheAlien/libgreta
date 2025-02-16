@@ -23,7 +23,7 @@ UNAME_S = $(shell uname -s)
 ifdef DEBUG
 $(info ->Debugging symbols enabled) 
     CXXFLAGS += -g
-	LDFLAGS += $(shell pkg-config lua --libs)
+	LDFLAGS += $(shell pkg-config libzip lua --libs)
 	BIN_DIR = bin/
 else
 $(info ->Release mode)
@@ -34,8 +34,8 @@ $(info ->Release mode)
 endif
 
 
-CXXFLAGS += $(shell pkg-config lua --cflags)
-
+CXXFLAGS += $(shell pkg-config libzip lua --cflags)
+LDFLAGS += $(shell pkg-config libzip --libs)
 
 COMPILE_COMMAND = $(CXX) $(CXXFLAGS)
 
