@@ -288,6 +288,9 @@ static Level LoadLevel15(std::istream& in){
 		jsonReadInt(j, "fire_color_1", sector->fire_color_1);
 		jsonReadInt(j, "fire_color_2", sector->fire_color_2);
 
+        jsonReadInt(j, "rain_color", sector->rain_color);
+        jsonReadString(j, "gfx", sector->gfxTextureName);
+
 
 		// Background tiles
         ReadTilesArray(in, sector->background_tiles, width, height, compression);
@@ -302,12 +305,7 @@ static Level LoadLevel15(std::istream& in){
     return level;
 }
 
-Level LoadLevel(const std::string& filename){
-    std::ifstream f(filename, std::ios::binary);
-    if(!f.good()){
-         throw std::runtime_error("Cannot read a file: "+filename);
-    }
-    
+static Level LoadLevel_stream(std::istream& f){
     char version[5];
     f.read(version, sizeof(version));    
     version[4] = '\0';
@@ -324,7 +322,27 @@ Level LoadLevel(const std::string& filename){
         throw std::runtime_error(os.str());
     }
 }
-void SaveLevel(const Level& level, const std::string& filename){
+
+Level LoadLevel_s(const std::string& filename){
+    std::ifstream f(filename, std::ios::binary);
+    if(!f.good()){
+        panicWhenFileNotFound(filename);
+    }
+    return LoadLevel_stream(f);
+}
+
+Level LoadLevel(const File& file){
+    std::vector<char> buffer = file.getContent();
+    if(buffer.size() < 5){
+        throw std::runtime_error("Shit happened!");
+    }
+
+    std::string_view view(buffer.data(), buffer.size());
+    std::istringstream f(std::string(view), std::ios::binary);
+    return LoadLevel_stream(f);
+}
+
+void SaveLevel_s(const Level& level, const std::string& filename){
     std::ofstream f(filename, std::ios::binary);
     if(!f.good()){
          throw std::runtime_error("Unable to save level!");
@@ -376,6 +394,9 @@ void SaveLevel(const Level& level, const std::string& filename){
 		j["splash_color"] = sector->splash_color;
 		j["fire_color_1"] = sector->fire_color_1;
 		j["fire_color_2"] = sector->fire_color_2;
+        j["rain_color"] = sector->rain_color;
+
+        j["gfx"] = sector->gfxTextureName;
 
 		WriteCBOR(f, j);
 

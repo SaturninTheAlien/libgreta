@@ -50,6 +50,8 @@ void ExposeLevelClasses(sol::table& t){
     "splash_color", &LevelSector::splash_color,
     "fire_color_1", &LevelSector::fire_color_1,
     "fire_color_2", &LevelSector::fire_color_2,
+    "rain_color", &LevelSector::rain_color,
+    "gfxTexture", &LevelSector::gfxTextureName,
 
     "getWidth", &LevelSector::getWidth,
     "getHeight", &LevelSector::getHeight,
@@ -91,8 +93,8 @@ void ExposeLevelClasses(sol::table& t){
 }
 
 void ExposeLevelIO(sol::table& t){
-    t["loadLevel"] = LoadLevel;
-    t["saveLevel"] = SaveLevel;
+    t["loadLevel"] = sol::overload(LoadLevel_s, LoadLevel);
+    t["saveLevel"] = SaveLevel_s;
 }
 
 }

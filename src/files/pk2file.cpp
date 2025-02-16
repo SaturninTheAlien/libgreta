@@ -10,7 +10,7 @@ namespace fs = std::filesystem;
 namespace libgreta{
 
 
-static void panicWhenFileNotFound(const std::string& path){
+void panicWhenFileNotFound(const std::string& path){
 	std::ostringstream os;
 	os<<"Cannot open the file: \""<<path<<"\"!";
 	throw std::runtime_error(os.str());

@@ -60,10 +60,14 @@ public:
     std::string backgroundName;
     std::string musicName;
 
+    std::string gfxTextureName;
+
     int weather = 0;
     int splash_color = -1; //based on the tileset
     int fire_color_1 = 64;  //red
     int fire_color_2 = 128; //orange
+
+    int rain_color = 40;    //blue rain
     
     int background_scrolling = 0;
 

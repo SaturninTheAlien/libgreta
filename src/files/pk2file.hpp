@@ -8,6 +8,8 @@
 
 namespace libgreta{
 
+GRETA_API void panicWhenFileNotFound(const std::string& path);
+
 GRETA_API class File {
 public:
     File(std::string path):
