@@ -50,8 +50,8 @@ SpritePrototype::SpritePrototype(PrototypeClass10 &proto){
 	this->ammo2_str = ReadLegacyString(proto.ammo2_str, 13);
 
 	for (int i=0;i<SPRITE_SOUNDS_NUMBER_LEGACY;i++) {
-		this->sound_files[i] = ReadLegacyString(proto.sound_files[i], 13);
-		this->sounds[i] = proto.sounds[i];
+		this->sounds[i] = ReadLegacyString(proto.sound_files[i], 13);
+		//this->sounds[i] = proto.sounds[i];
 	}
 
 	//animations_number		= proto.animations_number;
@@ -104,8 +104,8 @@ SpritePrototype::SpritePrototype(PrototypeClass11 &proto){
 	this->ammo2_str = ReadLegacyString(proto.ammo2_str, 13);
 
 	for (int i=0;i<SPRITE_SOUNDS_NUMBER_LEGACY;i++) {
-		this->sound_files[i] = ReadLegacyString(proto.sound_files[i], 13);
-		this->sounds[i] = proto.sounds[i];
+		this->sounds[i] = ReadLegacyString(proto.sound_files[i], 13);
+		//this->sounds[i] = proto.sounds[i];
 	}
 
 	can_open_locks				= proto.can_open_locks;
@@ -163,8 +163,8 @@ SpritePrototype::SpritePrototype(PrototypeClass12 &proto){
 	this->ammo2_str = ReadLegacyString(proto.ammo2_str, 13);
 
 	for (int i=0;i<SPRITE_SOUNDS_NUMBER_LEGACY;i++) {
-		this->sound_files[i] = ReadLegacyString(proto.sound_files[i], 13);
-		this->sounds[i] = proto.sounds[i];
+		this->sounds[i] = ReadLegacyString(proto.sound_files[i], 13);
+		//this->sounds[i] = proto.sounds[i];
 	}
 
 	sound_frequency			= proto.sound_frequency;
@@ -231,8 +231,8 @@ SpritePrototype::SpritePrototype(PrototypeClass13 &proto){
 	this->ammo2_str = ReadLegacyString(proto.ammo2_str, 100);  //proto.ammo2_str;
 
 	for (int i=0;i<SPRITE_SOUNDS_NUMBER_LEGACY;i++) {
-		this->sound_files[i] = ReadLegacyString(proto.sound_files[i], 100);
-		this->sounds[i] = proto.sounds[i];
+		this->sounds[i] = ReadLegacyString(proto.sound_files[i], 100);
+		//this->sounds[i] = proto.sounds[i];
 	}
 
 	sound_frequency			= proto.sound_frequency;
@@ -451,8 +451,8 @@ SpritePrototype::SpritePrototype(const nlohmann::json& j){
 	if(j.contains("sounds")){
 		const nlohmann::json& j_sounds = j["sounds"];
 		for(std::pair<std::string, int> p: SoundTypesDict){
-			this->sounds[p.second] = -1;
-			jsonReadString(j_sounds, p.first, this->sound_files[p.second]);
+			//this->sounds[p.second] = -1;
+			jsonReadString(j_sounds, p.first, this->sounds[p.second]);
 		}
 	}
 
@@ -494,7 +494,7 @@ void to_json(nlohmann::json& j, const SpritePrototype& c){
 
     json sounds;
     for(std::pair<std::string, int> p: SpritePrototype::SoundTypesDict){
-        sounds[p.first] = c.sound_files[p.second];        
+        sounds[p.first] = c.sounds[p.second];        
     }
 
     j["sounds"] = sounds;
@@ -531,7 +531,14 @@ void to_json(nlohmann::json& j, const SpritePrototype& c){
     j["immunity_type"] = c.immunity_type;
     j["score"] = c.score;
 
-    j["ai"] = c.AI_v;
+	{
+		std::vector<int> tmp;
+		for(const int& ai: c.AI_v){
+			if(ai!=0)tmp.emplace_back(ai);
+		}
+		j["ai"] = tmp;
+	}
+    //j["ai"] = c.AI_v;
     j["max_jump"] = c.max_jump;
     j["max_speed"] = c.max_speed;
     j["charge_time"] = c.charge_time;

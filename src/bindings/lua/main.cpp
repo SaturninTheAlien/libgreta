@@ -5,6 +5,7 @@
 #include "lua_sprite.hpp"
 #include "lua_level.hpp"
 #include "lua_pk2files.hpp"
+#include "lua_crawler.hpp"
 
 #include <iostream>
 
@@ -28,6 +29,7 @@ sol::table open_libgreta(sol::this_state L) {
 	ExposeLevelClasses(module);	
 	ExposeLevelIO(module);
 	ExposePK2FilesApi(module);
+	ExposeCrawler(module);
 
 	return module;
 }

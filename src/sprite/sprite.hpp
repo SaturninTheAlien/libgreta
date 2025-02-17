@@ -61,13 +61,11 @@ public:
 
     std::string version = "2.0";
 
-    std::string filename;
     std::string picture_filename;
     
     int     type = TYPE_NOTHING;
 
-    std::array<std::string, SPRITE_SOUNDS_NUMBER> sound_files = {""};
-    std::array<int, SPRITE_SOUNDS_NUMBER> sounds = {-1};
+    std::array<std::string, SPRITE_SOUNDS_NUMBER> sounds;
 
     int      frames_number            = 0;
 
@@ -118,12 +116,6 @@ public:
 
     std::optional<Point2D> attack1_offset;
     std::optional<Point2D> attack2_offset;
-
-
-    SpritePrototype* transformation_p     = nullptr;
-    SpritePrototype* bonus_p      = nullptr;
-    SpritePrototype* ammo1_p     = nullptr;
-    SpritePrototype* ammo2_p     = nullptr;
 
     bool    check_tiles = true;
     int     sound_frequency      = 22050;

@@ -1,20 +1,25 @@
 #include "lua_sprite.hpp"
 #include "../../sprite/sprite.hpp"
 #include "../../sprite/sprite_io.hpp"
+#include <string>
+
 
 namespace libgreta{
+
+static std::string Lua_ProtoToString(SpritePrototype* proto){
+    return std::string("SpritePrototype: \'")+proto->name+"\'";
+}
 
 void ExposeSpritePrototype(sol::table& t){
 
     t.new_usertype<SpritePrototype>("SpritePrototype",
     "name", &SpritePrototype::name,
-    "filename", &SpritePrototype::filename,
     "version", &SpritePrototype::version,
 
 
     "picture", &SpritePrototype::picture_filename,
     "type", &SpritePrototype::type,
-    "sounds", &SpritePrototype::sound_files,
+    "sounds", &SpritePrototype::sounds,
     "frames_number", &SpritePrototype::frames_number,
 
     //TO DO animations
@@ -81,11 +86,7 @@ void ExposeSpritePrototype(sol::table& t){
     "dead_weight", &SpritePrototype::dead_weight,
     "attack1_offset", &SpritePrototype::attack1_offset,
     "attack2_offset", &SpritePrototype::attack2_offset,
-
-    "transformation_p", &SpritePrototype::transformation_p,
-    "bonus_p", &SpritePrototype::bonus_p,
-    "ammo1_p", &SpritePrototype::ammo1_p,
-    "ammo2_p", &SpritePrototype::ammo2_p);
+    "__tostring", Lua_ProtoToString);
 }
 
 void ExposeSpritesIO(sol::table& t){
