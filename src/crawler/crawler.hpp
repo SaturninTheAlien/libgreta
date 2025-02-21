@@ -4,63 +4,96 @@
 #include <string>
 
 #include "sprite/sprite.hpp"
+#include "level/level.hpp"
+#include "files/pk2filesystem.hpp"
 
 namespace libgreta{
 
 enum{
-    MISSING_UNKNOWN_ASSET = 0,
-    MISSING_SPRITE = 1,
-    MISSING_SPRITE_TEXTURE = 2,
-    MISSING_SPRITE_SOUND = 3,
-    MISSING_TILESET = 4,
-    MISSING_TILESET_BG = 5,
-    MISSING_SCENERY = 6,
-    MISSING_LUA = 7
+    ASSET_UNKNOWN = 0,
+    ASSET_SPRITE = 1,
+    ASSET_SPRITE_TEXTURE = 2,
+    ASSET_SPRITE_SOUND = 3,
+    ASSET_TILESET = 4,
+    ASSET_TILESET_BG = 5,
+    ASSET_SCENERY = 6,
+    ASSET_LUA = 7
 };
-
-enum{    
-    REQUIRED_FROM_UNKNOWN_SOURCE = 0,
-    REQUIRED_FROM_LEVEL = 1,
-    REQUIRED_AMMO1 = 2,
-    REQUIRED_AMMO2 = 3,
-    REQUIRED_BONUS = 4,
-    REQUIRED_TRANSFORMATION = 5,
-    REQUIRED_FROM_LUA = 6
-};
-
-class GRETA_API MissingAsset{
+/**
+ * @brief 
+ * Tree-like structure
+ */
+class GRETA_API Node{
 public:
-    MissingAsset() = default;
-    MissingAsset(const std::string& name, int type, int requiredFrom, void* parent, std::string msg=""):
-    name(name), type(type), requiredFrom(requiredFrom), parent(parent), message(msg){
+    // Do not copy
+    Node(const Node& src) = delete;
+    Node& operator= (const Node& src) = delete;
 
+    virtual ~Node() = default;
+    std::string filename;
+    int type = ASSET_UNKNOWN;
+    Node* parent = nullptr;
+
+protected:
+    Node(const std::string& filename, int type, Node* parent):
+        filename(filename), type(type), parent(parent){
     }
 
-    std::string name;
+    friend class PK2Crawler;
+};
 
-    int type = MISSING_SPRITE;
-    int requiredFrom = REQUIRED_FROM_UNKNOWN_SOURCE;
-    void*parent = nullptr;
-    bool malformed = false;
+class GRETA_API MissingAsset: public Node{
+public:
+    // Do not copy
+    MissingAsset(const MissingAsset& src)=delete;
+    MissingAsset& operator= (const MissingAsset& src)=delete;
+
+protected:
+
+    MissingAsset(const std::string& name, int type, Node* parent):
+    Node(name, type, parent){
+    }
+
+    friend class PK2Crawler;
+};
+
+class GRETA_API MalformedAsset: public Node{
+
+public:
+    // Do not copy
+    MalformedAsset(const MalformedAsset& src)=delete;
+    MalformedAsset& operator= (const MalformedAsset& src)=delete;
+
 
     std::string message;
+protected:
+    MalformedAsset(const std::string& name, int type, Node* parent, std::string msg):
+        Node(name, type, parent), message(msg){
+    }
+    friend class PK2Crawler;
 };
 
-
-class GRETA_API SpriteNode{
+class GRETA_API SpriteNode: public Node{
 public:
-    SpriteNode()=default;
-    SpriteNode(const std::string& filename, const SpritePrototype& proto):
-    filename(filename), prototype(proto)
-    {
 
-    }
-    std::string filename;
+    // Do not copy
+    SpriteNode(const SpriteNode& src)=delete;
+    SpriteNode& operator= (const SpriteNode& src)=delete;
+
     SpritePrototype prototype;    
     SpriteNode* transformation     = nullptr;
     SpriteNode* bonus      = nullptr;
     SpriteNode* ammo1     = nullptr;
     SpriteNode* ammo2     = nullptr;
+
+    Node * texture = nullptr;
+
+protected:
+    SpriteNode(const std::string& filename, const SpritePrototype& proto, SpriteNode* parent = nullptr):
+    Node(filename, ASSET_SPRITE, parent), prototype(proto){
+        
+    }
+    friend class PK2Crawler;
 };
 
 class GRETA_API PK2Crawler{
@@ -68,12 +101,15 @@ public:
     PK2Crawler()=default;
     bool verbose = false;
 
-    SpriteNode* loadSpriteRecursive(const std::string& name, int requiredFrom, void*parent);
+    SpriteNode* loadSpriteRecursive(const std::string& name, Node *parent);
 
     SpriteNode* loadSprite(const std::string&name){
-        return this->loadSpriteRecursive(name, REQUIRED_FROM_UNKNOWN_SOURCE, nullptr);
+        return this->loadSpriteRecursive(name, nullptr);
     }
-    
+
+
+
+   
     //DO NOT COPY objects of this class!
     PK2Crawler(const PK2Crawler& src)=delete;
     PK2Crawler& operator=(const PK2Crawler& src) = delete;
@@ -81,14 +117,10 @@ public:
     ~PK2Crawler();
 private:
 
-    void lookForTexture(SpriteNode* node);
-    void lookForSound(SpriteNode*node, const std::string& sound);
+    Node* lookForAsset(std::string name, const std::string& dir, int type, Node * parent,
+    const std::string& color = "\x1B[34m");
 
-    std::vector<std::string> spriteTextures;
-    std::vector<std::string> spriteSounds;
-
-    std::vector<SpriteNode*> spriteNodes;
-    std::vector<MissingAsset> missingAssets;
+    std::vector<Node* > nodes;
 };
 
 }
