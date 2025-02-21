@@ -8,6 +8,11 @@ static std::string Lua_SpriteNodeStr(SpriteNode* node){
     return std::string("SpriteNode: \'")+node->filename+"\'";
 }
 
+static void Lua_CrawlerCheckLevel(PK2Crawler* crawler, const Level& level){
+    if(crawler==nullptr)return;
+
+    crawler->checkLevel(level, nullptr);
+}
 
 void ExposeCrawler(sol::table& t){
     t.new_usertype<SpriteNode>("SpriteNode",
@@ -23,7 +28,9 @@ void ExposeCrawler(sol::table& t){
 
     t.new_usertype<PK2Crawler>("Crawler",
     "loadSprite", &PK2Crawler::loadSprite,
-    "verbose", &PK2Crawler::verbose);
+    "verbose", &PK2Crawler::verbose,
+    "loadLevel", &PK2Crawler::loadLevel,
+    "checkLevel", Lua_CrawlerCheckLevel);
 }
 
 }

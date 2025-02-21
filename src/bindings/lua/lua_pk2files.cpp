@@ -25,6 +25,7 @@ static std::string Lua_FileToStr(File* file){
 void ExposePK2FilesApi(sol::table& t){
 
     t.new_usertype<File>("File",
+    sol::constructors<File(const std::string&)>(),
     "isZip", &File::isZip,
     "getFilename", &File::getFilename,
     "getExtension", &File::getExtension,
@@ -36,6 +37,7 @@ void ExposePK2FilesApi(sol::table& t){
     t["GetAssetsPath"] = GetAssetsPath;
 
     t["SetEpisode"] = SetEpisode;
+    t["SearchForLevels"] = SearchForLevels;
     t["FindAsset"] = sol::overload(FindAsset, Lua_FindAsset1);
 }
 

@@ -3,6 +3,8 @@
 #include "utils/zip_utils.hpp"
 #include "utils/string_utils.hpp"
 
+//#include <iostream>
+
 namespace fs = std::filesystem;
 
 namespace libgreta{
@@ -193,40 +195,26 @@ std::optional<File> FindAsset(const std::string& name, const std::string& defaul
     return op;
 }
 
-std::vector<std::string> ScanDirectory_s(const std::string& name, const std::string& filter){
-    fs::path dir(name);
-    if(!dir.is_absolute()){
-        dir = mAssetsPath / dir;
-    }
-    std::vector<std::string> result;
-    if(!fs::exists(dir) || !fs::is_directory(dir)){
-        //PLog::Write(PLog::WARN, "PFile", "Directory \"%s\" not found, cannot scan it", name.c_str());
-        return result;
+std::vector<File> SearchForLevels(){
+    std::vector<File> levels;
+    if(mEpisodeZip!=nullptr){
+        throw std::runtime_error("Zips not supported yet!");
     }
 
+    //std::cout<<mEpisodePath<<std::endl;
 
-    for (const auto & entry : fs::directory_iterator(dir)){
+    for(const auto& entry: fs::directory_iterator(mEpisodePath)){
 
-        if(filter.empty()){
-            result.push_back(entry.path().filename().string());
-        }
-        else if(filter=="/"){
-            if(entry.is_directory()){
-                result.push_back(entry.path().filename().string());
-            }
-        }
-        else{
-            auto filename = entry.path().filename();
-            std::string extension = PString::lowercase(filename.extension().string());
-            if(extension==filter){
-                result.push_back(filename.string());
-            }
+        //std::cout<<entry.path()<<std::endl;
+
+        if(!entry.is_directory()){
+            std::string extension = entry.path().extension().string();
+            if(extension==".map"){
+                levels.emplace_back(File(entry.path().string()));
+            }            
         }
     }
-
-    std::sort(result.begin(), result.end());
-    
-    return result;
+    return levels;
 }
 
 }

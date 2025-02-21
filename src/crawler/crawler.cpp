@@ -2,6 +2,8 @@
 #include "files/pk2filesystem.hpp"
 #include "utils/string_utils.hpp"
 #include "sprite/sprite_io.hpp"
+#include "level/level_io.hpp"
+
 #include <iostream>
 
 
@@ -19,6 +21,68 @@ PK2Crawler::~PK2Crawler(){
 }
 
 
+Node* PK2Crawler::loadLevel(const File& file){
+
+    Node * levelNode = new Node(file.getFilename(), ASSET_LEVEL, nullptr);
+
+    if(this->verbose){
+        std::cout<<"Loading level: \x1B[93m\""<<file.getFilename()<<"\"\x1B[0m"<<std::endl;
+    }
+
+    this->nodes.emplace_back(levelNode);
+
+    Level level = LoadLevel(file);
+    this->checkLevel(level, levelNode);
+
+    return levelNode;
+}
+
+void PK2Crawler::checkLevel(const Level& level, Node * node){
+
+    //Lua
+    this->lookForAsset(level.lua_script,
+        LUA_DIR,
+        ASSET_LUA,
+        node,
+        "\x1B[94m");
+
+    for(const LevelSector* sector: level.sectors){
+
+        //BG
+        this->lookForAsset(sector->backgroundName,
+            SCENERY_DIR,
+            ASSET_SCENERY,
+            node,
+            "\x1B[92m");
+
+        //Tileset FG
+        this->lookForAsset(sector->tilesetName,
+            TILES_DIR,
+            ASSET_TILESET,
+            node,
+            "\x1B[92m");
+
+        //Tileset BG
+        this->lookForAsset(sector->bgTilesetName,
+            TILES_DIR,
+            ASSET_TILESET,
+            node,
+            "\x1B[92m");
+
+        //GFX texture
+        this->lookForAsset(sector->gfxTextureName,
+            GFX_DIR,
+            ASSET_GFX,
+            node,
+            "\x1B[92m");
+    }
+
+    //Sprites
+    for(const std::string& spriteName: level.spritesList){
+        this->loadSpriteRecursive(spriteName, node);
+    }
+}
+
 SpriteNode* PK2Crawler::loadSpriteRecursive(const std::string& name,Node *parent){
     try{
         if(name.empty()){
@@ -27,6 +91,7 @@ SpriteNode* PK2Crawler::loadSpriteRecursive(const std::string& name,Node *parent
 
 
         std::string name1 = PString::rtrim(PString::lowercase(name));
+        
         //require .spr2 at first, if not found require .spr
         if(PString::endsWith(name1, ".spr")){
             name1+="2";
@@ -40,7 +105,7 @@ SpriteNode* PK2Crawler::loadSpriteRecursive(const std::string& name,Node *parent
         }
 
         if(this->verbose){
-            std::cout<<"\x1B[32mLooking for: \""<<name1<<"\"\x1B[0m"<<std::endl;
+            std::cout<<"Looking for: "<< "\x1B[32m\""<<name1<<"/.spr\"\x1B[0m"<<std::endl;
         }
 
         std::optional<File> file = FindAsset(name1, SPRITES_DIR, ".spr");
@@ -76,7 +141,8 @@ SpriteNode* PK2Crawler::loadSpriteRecursive(const std::string& name,Node *parent
                 soundName,
                 SPRITES_DIR,
                 ASSET_SPRITE_SOUND,
-                spriteNode);
+                spriteNode,
+                "\x1B[34m");
         }
 
         //bonus
@@ -118,7 +184,7 @@ Node* PK2Crawler::lookForAsset(std::string name, const std::string& dir, int ass
     }
 
     if(this->verbose){
-        std::cout<< color << "Looking for: \""<<name<<"\"\x1B[0m"<<std::endl;
+        std::cout<< "Looking for: "<<color<<"\""<<name<<"\"\x1B[0m"<<std::endl;
     }
 
     Node* result = nullptr;

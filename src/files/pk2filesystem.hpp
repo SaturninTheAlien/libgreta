@@ -28,6 +28,8 @@ GRETA_API bool SetAssetsPath(const std::string& name);
 GRETA_API std::string GetAssetsPath();
 GRETA_API void SetEpisode(const std::string& episodeName, PZip* zip_file);
 
+GRETA_API std::vector<File> SearchForLevels();
+
 GRETA_API std::optional<File> FindAsset(
     const std::string& name,
     const std::string& default_dir,

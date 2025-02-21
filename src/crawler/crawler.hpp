@@ -11,13 +11,14 @@ namespace libgreta{
 
 enum{
     ASSET_UNKNOWN = 0,
-    ASSET_SPRITE = 1,
-    ASSET_SPRITE_TEXTURE = 2,
-    ASSET_SPRITE_SOUND = 3,
-    ASSET_TILESET = 4,
-    ASSET_TILESET_BG = 5,
+    ASSET_LEVEL = 1,
+    ASSET_SPRITE = 2,
+    ASSET_SPRITE_TEXTURE = 3,
+    ASSET_SPRITE_SOUND = 4,
+    ASSET_TILESET = 5,
     ASSET_SCENERY = 6,
-    ASSET_LUA = 7
+    ASSET_LUA = 7,
+    ASSET_GFX = 8
 };
 /**
  * @brief 
@@ -108,7 +109,8 @@ public:
     }
 
 
-
+    Node* loadLevel(const File& file);
+    void checkLevel(const Level& level, Node* node);
    
     //DO NOT COPY objects of this class!
     PK2Crawler(const PK2Crawler& src)=delete;
@@ -118,7 +120,7 @@ public:
 private:
 
     Node* lookForAsset(std::string name, const std::string& dir, int type, Node * parent,
-    const std::string& color = "\x1B[34m");
+    const std::string& color = "\x1B[0m");
 
     std::vector<Node* > nodes;
 };
