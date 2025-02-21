@@ -198,21 +198,24 @@ std::optional<File> FindAsset(const std::string& name, const std::string& defaul
 std::vector<File> SearchForLevels(){
     std::vector<File> levels;
     if(mEpisodeZip!=nullptr){
-        throw std::runtime_error("Zips not supported yet!");
-    }
+        std::vector<PZipEntry> entries = mEpisodeZip->scanDirectory(mEpisodePath.string(), ".map");
+        for(const PZipEntry& entry: entries){
 
-    //std::cout<<mEpisodePath<<std::endl;
+            levels.emplace_back(File(mEpisodeZip, entry));
 
-    for(const auto& entry: fs::directory_iterator(mEpisodePath)){
-
-        //std::cout<<entry.path()<<std::endl;
-
-        if(!entry.is_directory()){
-            std::string extension = entry.path().extension().string();
-            if(extension==".map"){
-                levels.emplace_back(File(entry.path().string()));
-            }            
         }
+    }
+    else{
+
+        for(const auto& entry: fs::directory_iterator(mEpisodePath)){
+            if(!entry.is_directory()){
+                std::string extension = entry.path().extension().string();
+                if(extension==".map"){
+                    levels.emplace_back(File(entry.path().string()));
+                }            
+            }
+        }
+
     }
     return levels;
 }

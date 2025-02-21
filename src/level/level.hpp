@@ -34,7 +34,7 @@ public:
 	int      icon_y = 0;                                         // icon x pos
     int      icon_id = 0;                                        // icon id
 
-    std::string lua_script = "main.lua";                        // lua script
+    std::string lua_script = "";                        // lua script
     int game_mode = 0;                                          // game mode  
 };
 

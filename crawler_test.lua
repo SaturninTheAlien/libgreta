@@ -30,7 +30,7 @@ function LevelTest()
 
     crawler:loadLevel(
         greta.File.new(
-            greta.GetAssetsPath() .. "/episodes/Debug Island/episodes/Debug Island/lua_cult.map"
+            greta.GetAssetsPath() .. "/episodes/Debug Island/lua_cult.map"
         )
     )
 end
