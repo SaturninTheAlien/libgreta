@@ -31,8 +31,14 @@ sol::table open_libgreta(sol::this_state L) {
 	ExposeLevelIO(module);
 
 	ExposeZipApi(module);
-	ExposePK2FilesApi(module);
+	
 	ExposeEpisode(module);
+
+	ExposeFileClass(module);
+
+	sol::table lua_fs = lua.create_table();
+	module["fs"] = lua_fs;
+	ExposeFilesystemAPI(lua_fs);
 
 	return module;
 }

@@ -9,7 +9,7 @@ local episodeName = "Debug Island"
 function EpisodeTest()
     
 
-    local episode = greta.Episode.new(assetsPath, episodeName)
+    local episode = greta.EpisodeTree.new(assetsPath, episodeName)
     episode.debug = true
 
     local levelFiles = episode:searchForLevels()
@@ -28,7 +28,7 @@ end
 
 
 -- function LevelTest()
---     local episode = greta.Episode.new()
+--     local episode = greta.EpisodeTree.new()
 --     episode.verbose = true
 
 --     episode:loadLevel(
@@ -40,7 +40,7 @@ end
 
 
 -- function SpriteTest()
---     local episode = greta.Episode.new()
+--     local episode = greta.EpisodeTree.new()
 --     episode.verbose = true
 
 --     local sprite = episode:loadSprite("dino.spr")

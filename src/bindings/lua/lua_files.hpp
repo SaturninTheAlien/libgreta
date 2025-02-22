@@ -3,6 +3,7 @@
 
 namespace libgreta{
 
-void ExposePK2FilesApi(sol::table& t);
+void ExposeFileClass(sol::table& t);
+void ExposeFilesystemAPI(sol::table& t);
 
 }

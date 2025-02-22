@@ -18,7 +18,7 @@ end
 
 function SagaTest()
     local zip = greta.Zip.new(assetsPath .. "/res/data/mapstore/tm.zip")
-    local episode = greta.Episode.new(assetsPath, "Time-Machine 2 - In The Future", zip)
+    local episode = greta.EpisodeTree.new(assetsPath, "Time-Machine 2 - In The Future", zip)
 
     -- episode.debug = true
     

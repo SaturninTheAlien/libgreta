@@ -12,6 +12,7 @@
 namespace libgreta{
 
 enum{
+    ASSET_EPISODE_ROOT = -1,
     ASSET_UNKNOWN = 0,
     ASSET_LEVEL = 1,
     ASSET_SPRITE = 2,
@@ -46,7 +47,7 @@ protected:
         filename(filename), type(type), parent(parent){
     }
 
-    friend class Episode;
+    friend class EpisodeTree;
 };
 
 class GRETA_API MissingAsset: public Asset{
@@ -63,7 +64,7 @@ protected:
     Asset(name, type, parent){
     }
 
-    friend class Episode;
+    friend class EpisodeTree;
 };
 
 class GRETA_API MalformedAsset: public Asset{
@@ -80,7 +81,7 @@ protected:
     MalformedAsset(const std::string& name, int type, Asset* parent, std::string msg):
         Asset(name, type, parent), what(msg){
     }
-    friend class Episode;
+    friend class EpisodeTree;
 };
 
 class GRETA_API SpriteAsset: public Asset{
@@ -104,19 +105,19 @@ protected:
     Asset(filename, ASSET_SPRITE, parent), prototype(proto){
         
     }
-    friend class Episode;
+    friend class EpisodeTree;
 };
 
-class GRETA_API Episode: public EpisodeFS{
+class GRETA_API EpisodeTree: public EpisodeFS{
 public:
 
-    Episode(const std::string& assetsPath,
+    EpisodeTree(const std::string& assetsPath,
         const std::string& episodeName):
     EpisodeFS(assetsPath, episodeName){
 
     }
 
-    Episode(const std::string& assetsPath,
+    EpisodeTree(const std::string& assetsPath,
         const std::string& episodeName,
         PZip * zip):
         EpisodeFS(assetsPath, episodeName, zip){
@@ -124,15 +125,15 @@ public:
     }
 
 
-    explicit Episode(const EpisodeFS& fs):
+    explicit EpisodeTree(const EpisodeFS& fs):
     EpisodeFS(fs){
 
     }
 
     //DO NOT COPY objects of this class!
-    Episode(const Episode& src)=delete;
-    Episode& operator=(const Episode& src) = delete;
-    ~Episode();
+    EpisodeTree(const EpisodeTree& src)=delete;
+    EpisodeTree& operator=(const EpisodeTree& src) = delete;
+    ~EpisodeTree();
 
     bool debug = false;
     Asset* loadSpriteRecursive(const std::string& name, Asset *parent);
@@ -146,14 +147,17 @@ public:
     //std::string getHealthReport()const;
 
     Asset* loadLevel(const File& file);
-       
-private:
+    void loadAllLevels();
+
+private:    
     void checkLevel(const Level& level, Asset* node);
 
     Asset* lookForAsset(std::string name, const std::string& dir, int type, Asset * parent,
     const std::string& color = "\x1B[0m");
 
     std::vector<Asset* > assets;
+    Asset * episodeRoot = nullptr;
+
 };
 
 }

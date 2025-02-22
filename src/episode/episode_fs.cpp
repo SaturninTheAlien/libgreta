@@ -71,6 +71,25 @@ EpisodeFS::EpisodeFS(const std::string& assetsPath, const std::string& episodeNa
     }
 }
 
+
+void EpisodeFS::setEpisode(const std::string& path, PZip* zip){
+    this->episodePath = path;
+    this->zip = zip;
+
+    if(zip==nullptr){
+        if(!this->episodePath.is_absolute()){
+            this->episodePath = this->assetsPath / "episodes" / this->episodePath;
+        }
+    }
+    else{
+        this->episodePath = fs::path("episodes") / this->episodePath;
+    }
+}
+
+void EpisodeFS::setAssetsPath(const std::string& path){
+    this->assetsPath = _fixAssetsPath(path);
+}
+
 /**
  * @brief 
  * Finding files, cAsE insensitive

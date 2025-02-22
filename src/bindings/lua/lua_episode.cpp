@@ -43,23 +43,29 @@ void ExposeEpisode(sol::table& t){
         sol::constructors<
         EpisodeFS(const std::string&, const std::string&, PZip*),
         EpisodeFS(const std::string&, const std::string&)>(),
+
+
+        "setEpisode", &EpisodeFS::setEpisode,
         "getAssetsPath", &EpisodeFS::getAssetsPath,
         "getEpisodePath", &EpisodeFS::getEpisodePath,
+        "getEpisodeName", &EpisodeFS::getEpisodeName,
+
         "findAsset", &EpisodeFS::findAsset,
-        "searchForLevels", &EpisodeFS::searchForLevels    
+        "searchForLevels", &EpisodeFS::searchForLevels
     );
 
 
-    t.new_usertype<Episode>("Episode",
+    t.new_usertype<EpisodeTree>("EpisodeTree",
     sol::constructors<
-        Episode(const std::string&, const std::string&, PZip*),
-        Episode(const std::string&, const std::string&)>(),
-        "loadSprite", &Episode::loadSprite,
-        "debug", &Episode::debug,
-        "loadLevel", &Episode::loadLevel,
+        EpisodeTree(const std::string&, const std::string&, PZip*),
+        EpisodeTree(const std::string&, const std::string&)>(),
+        "loadSprite", &EpisodeTree::loadSprite,
+        "debug", &EpisodeTree::debug,
+        "loadLevel", &EpisodeTree::loadLevel,
+        "loadAllLevels", &EpisodeTree::loadAllLevels,
 
-        "getMissingAssets", &Episode::getMissingAssets,
-        "getMalformedAssets", &Episode::getMalformedAssets,
+        "getMissingAssets", &EpisodeTree::getMissingAssets,
+        "getMalformedAssets", &EpisodeTree::getMalformedAssets,
 
         sol::base_classes, sol::bases<EpisodeFS>()
     );

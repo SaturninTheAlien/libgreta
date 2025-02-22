@@ -29,6 +29,7 @@ class PZip;
 
 class GRETA_API EpisodeFS{
 public:
+    EpisodeFS() = default;
     EpisodeFS(const std::string& assetsPath, const std::string& episodePath);
     EpisodeFS(const std::string& assetsPath,
         const std::string& episodeName,
@@ -42,6 +43,13 @@ public:
     std::string getEpisodePath(){
         return this->episodePath.string();
     }
+
+    std::string getEpisodeName()const{
+        return this->episodePath.filename().string();
+    }
+
+    void setAssetsPath(const std::string& path);
+    void setEpisode(const std::string& path, PZip* zip);
     
     std::optional<File> findAsset(const std::string& name,
         const std::string& default_dir,
@@ -56,7 +64,6 @@ protected:
     std::optional<File> findEpisodeAsset(const std::string& name,
         const std::string& default_dir,
         const std::string& alt_extension)const;
-
 
 private:
     std::filesystem::path assetsPath;

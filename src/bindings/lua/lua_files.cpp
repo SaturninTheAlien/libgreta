@@ -2,6 +2,7 @@
 
 #include "utils/file.hpp"
 #include <optional>
+#include <filesystem>
 
 namespace libgreta{
 
@@ -14,8 +15,20 @@ static std::string Lua_FileToStr(File* file){
     }
 }
 
-void ExposePK2FilesApi(sol::table& t){
+static bool Lua_IsAbsolute(const std::string& s){
+    return std::filesystem::path(s).is_absolute();
+}
 
+static bool Lua_Exists(const std::string& s){
+    return std::filesystem::exists(s);
+}
+
+static bool Lua_IsDir(const std::string& s){
+    return std::filesystem::is_directory(s);
+}
+
+
+void ExposeFileClass(sol::table& t){
     t.new_usertype<File>("File",
     sol::constructors<File(const std::string&)>(),
     "isZip", &File::isZip,
@@ -24,8 +37,15 @@ void ExposePK2FilesApi(sol::table& t){
     "getContent", &File::getContent,
     "getContentAsString", &File::getContentAsString,
     "__tostring", Lua_FileToStr);
+}
 
-    t["ScanDir"] = ScanDir;
+
+void ExposeFilesystemAPI(sol::table& t){
+
+    t["exits"] = Lua_Exists;
+    t["scan_dir"] = ScanDir;
+    t["is_absolute"] = Lua_IsAbsolute;
+    t["is_directory"] = Lua_IsDir;
 }
 
 }

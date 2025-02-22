@@ -64,7 +64,7 @@ std::string SpriteAsset::str()const{
     return std::string("(sprite) ")+ s + "[.spr2/.spr]";
 }
 
-Episode::~Episode(){
+EpisodeTree::~EpisodeTree(){
     for(Asset*& proto:this->assets){
         if(proto!=nullptr){
             delete proto;
@@ -75,7 +75,20 @@ Episode::~Episode(){
     this->assets.clear();
 }
 
-Asset* Episode::loadLevel(const File& file){
+
+void EpisodeTree::loadAllLevels(){
+    for(const File& file : this->searchForLevels()){
+        this->loadLevel(file);
+    }
+}
+
+Asset* EpisodeTree::loadLevel(const File& file){
+
+    std::string episodeName = this->getEpisodeName();
+    if(this->episodeRoot==nullptr || this->episodeRoot->filename != episodeName){
+        this->episodeRoot = new Asset(episodeName, ASSET_EPISODE_ROOT, nullptr);
+    }
+
 
     if(this->debug){
         std::cout<<"Loading level: \x1B[93m\""<<file.getFilename()<<"\"\x1B[0m"<<std::endl;
@@ -83,7 +96,7 @@ Asset* Episode::loadLevel(const File& file){
 
     try{
         Level level = LoadLevel(file);
-        Asset * levelAsset = new Asset(file.getFilename(), ASSET_LEVEL, nullptr);
+        Asset * levelAsset = new Asset(file.getFilename(), ASSET_LEVEL, this->episodeRoot);
         this->assets.emplace_back(levelAsset);
         this->checkLevel(level, levelAsset);
         return levelAsset;
@@ -102,7 +115,7 @@ Asset* Episode::loadLevel(const File& file){
     return nullptr;
 }
 
-void Episode::checkLevel(const Level& level, Asset * levelAsset){
+void EpisodeTree::checkLevel(const Level& level, Asset * levelAsset){
 
     //Lua
     this->lookForAsset(level.lua_script,
@@ -148,7 +161,7 @@ void Episode::checkLevel(const Level& level, Asset * levelAsset){
     }
 }
 
-Asset* Episode::loadSpriteRecursive(const std::string& name,Asset *parent){
+Asset* EpisodeTree::loadSpriteRecursive(const std::string& name,Asset *parent){
     try{
         if(name.empty()){
             return nullptr;
@@ -234,7 +247,7 @@ Asset* Episode::loadSpriteRecursive(const std::string& name,Asset *parent){
     return nullptr;
 }
 
-Asset* Episode::lookForAsset(std::string name, const std::string& dir, int assetType, Asset * parent,
+Asset* EpisodeTree::lookForAsset(std::string name, const std::string& dir, int assetType, Asset * parent,
         const std::string& color){
     //
 
@@ -268,7 +281,7 @@ Asset* Episode::lookForAsset(std::string name, const std::string& dir, int asset
     return result;
 }
 
-std::vector<MissingAsset*> Episode::getMissingAssets(){
+std::vector<MissingAsset*> EpisodeTree::getMissingAssets(){
     std::vector<MissingAsset*>result;
     for(Asset * asset: this->assets){
         MissingAsset * missingAsset = dynamic_cast<MissingAsset*>(asset);
@@ -279,7 +292,7 @@ std::vector<MissingAsset*> Episode::getMissingAssets(){
     return result;
 }
 
-std::vector<MalformedAsset*> Episode::getMalformedAssets(){
+std::vector<MalformedAsset*> EpisodeTree::getMalformedAssets(){
     std::vector<MalformedAsset*>result;
     for(Asset * asset: this->assets){
         MalformedAsset * missingAsset = dynamic_cast<MalformedAsset*>(asset);
