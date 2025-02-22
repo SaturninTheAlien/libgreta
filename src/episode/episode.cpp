@@ -3,45 +3,112 @@
 #include "sprite/sprite_io.hpp"
 #include "level/level_io.hpp"
 
+#include <sstream>
 #include <iostream>
 
 
 namespace libgreta{
 
+std::string Asset::str()const{
+    return this->filename;
+}
+
+
+std::string Asset::getStackTrace()const{
+    std::ostringstream os;
+
+    int i = 0;
+    const Asset* child = nullptr;
+    
+    for(const Asset* asset = this; asset!=nullptr; asset = asset->parent){
+        os<<"["<<i<<"] "<<asset->str();
+
+        const SpriteAsset* sprite = dynamic_cast<const SpriteAsset*>(asset);
+        if(sprite!=nullptr && child!=nullptr){
+            if(sprite->ammo1 == child){
+                os << " (ammo1)";
+            }
+            if(sprite->ammo2 == child){
+                os << " (ammo2)";
+            }
+            if(sprite->bonus == child){
+                os << " (bonus)";
+            }
+            if(sprite->transformation == child){
+                os << " (transformation)";
+            }
+            if(sprite->texture == child){
+                os << " (texture)";
+            }
+        }
+
+        os << std::endl;
+        ++i;
+        child = asset;
+    }
+
+    return os.str();
+}
+
+std::string MissingAsset::str()const{
+    return std::string("(missing!) ") + this->filename;
+} 
+
+std::string MalformedAsset::str()const{
+    return std::string("(malformed!) ")+ this->filename;
+}
+
+
+std::string SpriteAsset::str()const{
+    std::string s = PString::removeSuffix(this->filename, ".spr2");
+    return std::string("(sprite) ")+ s + "[.spr2/.spr]";
+}
+
 Episode::~Episode(){
-    for(Node*& proto:this->nodes){
+    for(Asset*& proto:this->assets){
         if(proto!=nullptr){
             delete proto;
             proto = nullptr;
         }
     }
 
-    this->nodes.clear();
+    this->assets.clear();
 }
 
-Node* Episode::loadLevel(const File& file){
-
-    Node * levelNode = new Node(file.getFilename(), ASSET_LEVEL, nullptr);
+Asset* Episode::loadLevel(const File& file){
 
     if(this->debug){
         std::cout<<"Loading level: \x1B[93m\""<<file.getFilename()<<"\"\x1B[0m"<<std::endl;
     }
 
-    this->nodes.emplace_back(levelNode);
+    try{
+        Level level = LoadLevel(file);
+        Asset * levelAsset = new Asset(file.getFilename(), ASSET_LEVEL, nullptr);
+        this->assets.emplace_back(levelAsset);
+        this->checkLevel(level, levelAsset);
+        return levelAsset;
+    }
+    catch(const std::exception& e){
+        MalformedAsset* malformedLevel = new MalformedAsset(
+            file.getFilename(),
+            ASSET_LEVEL,
+            nullptr,
+            e.what());
 
-    Level level = LoadLevel(file);
-    this->checkLevel(level, levelNode);
+        this->assets.emplace_back(malformedLevel);
+        return malformedLevel;
+    }
 
-    return levelNode;
+    return nullptr;
 }
 
-void Episode::checkLevel(const Level& level, Node * node){
+void Episode::checkLevel(const Level& level, Asset * levelAsset){
 
     //Lua
     this->lookForAsset(level.lua_script,
         LUA_DIR,
         ASSET_LUA,
-        node,
+        levelAsset,
         "\x1B[94m");
 
     for(const LevelSector* sector: level.sectors){
@@ -50,38 +117,38 @@ void Episode::checkLevel(const Level& level, Node * node){
         this->lookForAsset(sector->backgroundName,
             SCENERY_DIR,
             ASSET_SCENERY,
-            node,
+            levelAsset,
             "\x1B[92m");
 
         //Tileset FG
         this->lookForAsset(sector->tilesetName,
             TILES_DIR,
             ASSET_TILESET,
-            node,
+            levelAsset,
             "\x1B[92m");
 
         //Tileset BG
         this->lookForAsset(sector->bgTilesetName,
             TILES_DIR,
             ASSET_TILESET,
-            node,
+            levelAsset,
             "\x1B[92m");
 
         //GFX texture
         this->lookForAsset(sector->gfxTextureName,
             GFX_DIR,
             ASSET_GFX,
-            node,
+            levelAsset,
             "\x1B[92m");
     }
 
     //Sprites
     for(const std::string& spriteName: level.spritesList){
-        this->loadSpriteRecursive(spriteName, node);
+        this->loadSpriteRecursive(spriteName, levelAsset);
     }
 }
 
-SpriteNode* Episode::loadSpriteRecursive(const std::string& name,Node *parent){
+Asset* Episode::loadSpriteRecursive(const std::string& name,Asset *parent){
     try{
         if(name.empty()){
             return nullptr;
@@ -96,9 +163,9 @@ SpriteNode* Episode::loadSpriteRecursive(const std::string& name,Node *parent){
         }
 
         //check if already loaded
-        for(Node * node: this->nodes){
+        for(Asset * node: this->assets){
             if(node->filename==name1 && node->type == ASSET_SPRITE){
-                return dynamic_cast<SpriteNode*>(node);
+                return node;
             }
         }
 
@@ -112,15 +179,14 @@ SpriteNode* Episode::loadSpriteRecursive(const std::string& name,Node *parent){
             if(this->debug){
                 std::cout<<"\x1B[31mSprite: \"" << name1<<"\" not found!\x1B[0m"<<std::endl;
             }
-            this->nodes.emplace_back(
-                new MissingAsset(name, ASSET_SPRITE, parent)
-            );
+            Asset* missing = new MissingAsset(name, ASSET_SPRITE, parent);
+            this->assets.emplace_back(missing);
 
-            return nullptr;
+            return missing;
         }
 
-        SpriteNode* spriteNode = new SpriteNode(name1, LoadSprite(*file));
-        this->nodes.emplace_back(spriteNode);
+        SpriteAsset* spriteNode = new SpriteAsset(name1, LoadSprite(*file), parent);
+        this->assets.emplace_back(spriteNode);
 
         const SpritePrototype& proto = spriteNode->prototype;
 
@@ -160,22 +226,22 @@ SpriteNode* Episode::loadSpriteRecursive(const std::string& name,Node *parent){
     }
     catch(const std::exception& e){
 
-        this->nodes.emplace_back(
-            new MalformedAsset(name, ASSET_SPRITE, parent, e.what())
-        );
+        MalformedAsset * malformed = new MalformedAsset(name, ASSET_SPRITE, parent, e.what());
+        this->assets.emplace_back(malformed);
+        return malformed;
     }
 
     return nullptr;
 }
 
-Node* Episode::lookForAsset(std::string name, const std::string& dir, int assetType, Node * parent,
+Asset* Episode::lookForAsset(std::string name, const std::string& dir, int assetType, Asset * parent,
         const std::string& color){
     //
 
     if(name.empty())return nullptr;
     
     name = PString::rtrim(PString::lowercase(name));
-    for(Node * node:this->nodes){
+    for(Asset * node:this->assets){
         if(node->type == assetType && node->filename == name){
             return node;
         }
@@ -185,7 +251,7 @@ Node* Episode::lookForAsset(std::string name, const std::string& dir, int assetT
         std::cout<< "Looking for: "<<color<<"\""<<name<<"\"\x1B[0m"<<std::endl;
     }
 
-    Node* result = nullptr;
+    Asset* result = nullptr;
 
     std::optional<File> file = this->findAsset(name, dir, "");
     if(!file.has_value()){
@@ -195,10 +261,32 @@ Node* Episode::lookForAsset(std::string name, const std::string& dir, int assetT
         result = new MissingAsset(name, assetType, parent);
     }
     else{
-        result = new Node(name, assetType, parent);
+        result = new Asset(name, assetType, parent);
     }
 
-    this->nodes.emplace_back(result);
+    this->assets.emplace_back(result);
+    return result;
+}
+
+std::vector<MissingAsset*> Episode::getMissingAssets(){
+    std::vector<MissingAsset*>result;
+    for(Asset * asset: this->assets){
+        MissingAsset * missingAsset = dynamic_cast<MissingAsset*>(asset);
+        if(missingAsset!=nullptr){
+            result.emplace_back(missingAsset);
+        }
+    }
+    return result;
+}
+
+std::vector<MalformedAsset*> Episode::getMalformedAssets(){
+    std::vector<MalformedAsset*>result;
+    for(Asset * asset: this->assets){
+        MalformedAsset * missingAsset = dynamic_cast<MalformedAsset*>(asset);
+        if(missingAsset!=nullptr){
+            result.emplace_back(missingAsset);
+        }
+    }
     return result;
 }
 

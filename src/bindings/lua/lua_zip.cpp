@@ -5,7 +5,7 @@
 namespace libgreta{
 
 void ExposeZipApi(sol::table& t){
-    t.new_usertype<PZip>("PZip",
+    t.new_usertype<PZip>("Zip",
     sol::constructors<PZip(const std::string&)>(),
     "findSubdirectories", &PZip::findSubdirectories);
 }

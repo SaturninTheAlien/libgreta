@@ -4,26 +4,40 @@
 
 namespace libgreta{
 
-static std::string Lua_SpriteNodeStr(SpriteNode* node){  
-    return std::string("SpriteNode: \'")+node->filename+"\'";
-}
-
-static void Lua_EpisodeCheckLevel(Episode* episode, const Level& level){
-    if(episode==nullptr)return;
-
-    episode->checkLevel(level, nullptr);
-}
-
 void ExposeEpisode(sol::table& t){
-    t.new_usertype<SpriteNode>("SpriteNode",
+
+    t.new_usertype<Asset>("Asset",
     sol::no_constructor,
-    "filename",  &SpriteNode::filename,
-    "prototype", &SpriteNode::prototype,
-    "bonus", &SpriteNode::bonus,
-    "ammo1", &SpriteNode::ammo1,
-    "ammo1", &SpriteNode::ammo2,
-    "transformation",&SpriteNode::transformation,
-    "__tostring", Lua_SpriteNodeStr);
+    "filename", sol::readonly(&Asset::filename),
+    "type",  sol::readonly(&Asset::type),
+    "parent", sol::readonly(&Asset::parent),
+    "getStackTrace", &Asset::getStackTrace,
+    "__tostring", &Asset::str);
+
+    t.new_usertype<MissingAsset>("MissingAsset",
+        sol::no_constructor,
+        "__tostring", &MissingAsset::str,
+        sol::base_classes, sol::bases<Asset>()
+    );
+
+    t.new_usertype<MalformedAsset>("MissingAsset",
+        sol::no_constructor,
+        "what", sol::readonly(&MalformedAsset::what),
+        "__tostring", &MalformedAsset::str,
+        sol::base_classes, sol::bases<Asset>()
+    );
+
+    t.new_usertype<SpriteAsset>("SpriteAsset",
+        "prototype", &SpriteAsset::prototype,
+        "bonus", &SpriteAsset::bonus,
+        "ammo1", &SpriteAsset::ammo1,
+        "ammo1", &SpriteAsset::ammo2,
+        "transformation",&SpriteAsset::transformation,
+        //"__tostring", &SpriteAsset::str,
+        sol::base_classes, sol::bases<Asset>()
+    );
+
+    
 
     t.new_usertype<EpisodeFS>("EpisodeFS",
         sol::constructors<
@@ -43,7 +57,10 @@ void ExposeEpisode(sol::table& t){
         "loadSprite", &Episode::loadSprite,
         "debug", &Episode::debug,
         "loadLevel", &Episode::loadLevel,
-        "checkLevel", Lua_EpisodeCheckLevel,
+
+        "getMissingAssets", &Episode::getMissingAssets,
+        "getMalformedAssets", &Episode::getMalformedAssets,
+
         sol::base_classes, sol::bases<EpisodeFS>()
     );
 }

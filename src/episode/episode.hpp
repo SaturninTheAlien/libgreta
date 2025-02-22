@@ -1,7 +1,8 @@
 #pragma once
 
-#include <vector>
 #include <string>
+#include <vector>
+
 #include <filesystem>
 
 #include "episode_fs.hpp"
@@ -25,74 +26,82 @@ enum{
  * @brief 
  * Tree-like structure
  */
-class GRETA_API Node{
+class GRETA_API Asset{
 public:
     // Do not copy
-    Node(const Node& src) = delete;
-    Node& operator= (const Node& src) = delete;
+    Asset(const Asset& src) = delete;
+    Asset& operator= (const Asset& src) = delete;
+    
+    virtual ~Asset() = default;
+    virtual std::string str()const;
 
-    virtual ~Node() = default;
     std::string filename;
     int type = ASSET_UNKNOWN;
-    Node* parent = nullptr;
+    Asset* parent = nullptr;
+
+    std::string getStackTrace()const;
 
 protected:
-    Node(const std::string& filename, int type, Node* parent):
+    Asset(const std::string& filename, int type, Asset* parent):
         filename(filename), type(type), parent(parent){
     }
 
     friend class Episode;
 };
 
-class GRETA_API MissingAsset: public Node{
+class GRETA_API MissingAsset: public Asset{
 public:
     // Do not copy
     MissingAsset(const MissingAsset& src)=delete;
     MissingAsset& operator= (const MissingAsset& src)=delete;
 
+    virtual std::string str()const;
+
 protected:
 
-    MissingAsset(const std::string& name, int type, Node* parent):
-    Node(name, type, parent){
+    MissingAsset(const std::string& name, int type, Asset* parent):
+    Asset(name, type, parent){
     }
 
     friend class Episode;
 };
 
-class GRETA_API MalformedAsset: public Node{
+class GRETA_API MalformedAsset: public Asset{
 
 public:
     // Do not copy
     MalformedAsset(const MalformedAsset& src)=delete;
     MalformedAsset& operator= (const MalformedAsset& src)=delete;
 
+    virtual std::string str()const;
 
-    std::string message;
+    std::string what;
 protected:
-    MalformedAsset(const std::string& name, int type, Node* parent, std::string msg):
-        Node(name, type, parent), message(msg){
+    MalformedAsset(const std::string& name, int type, Asset* parent, std::string msg):
+        Asset(name, type, parent), what(msg){
     }
     friend class Episode;
 };
 
-class GRETA_API SpriteNode: public Node{
+class GRETA_API SpriteAsset: public Asset{
 public:
 
     // Do not copy
-    SpriteNode(const SpriteNode& src)=delete;
-    SpriteNode& operator= (const SpriteNode& src)=delete;
+    SpriteAsset(const SpriteAsset& src)=delete;
+    SpriteAsset& operator= (const SpriteAsset& src)=delete;
 
     SpritePrototype prototype;    
-    SpriteNode* transformation     = nullptr;
-    SpriteNode* bonus      = nullptr;
-    SpriteNode* ammo1     = nullptr;
-    SpriteNode* ammo2     = nullptr;
+    Asset* transformation     = nullptr;
+    Asset* bonus      = nullptr;
+    Asset* ammo1     = nullptr;
+    Asset* ammo2     = nullptr;
 
-    Node * texture = nullptr;
+    Asset * texture = nullptr;
 
+    virtual std::string str()const;
 protected:
-    SpriteNode(const std::string& filename, const SpritePrototype& proto, SpriteNode* parent = nullptr):
-    Node(filename, ASSET_SPRITE, parent), prototype(proto){
+    SpriteAsset(const std::string& filename, const SpritePrototype& proto, Asset* parent):
+    Asset(filename, ASSET_SPRITE, parent), prototype(proto){
         
     }
     friend class Episode;
@@ -123,26 +132,28 @@ public:
     //DO NOT COPY objects of this class!
     Episode(const Episode& src)=delete;
     Episode& operator=(const Episode& src) = delete;
-
     ~Episode();
 
-
     bool debug = false;
-
-    SpriteNode* loadSpriteRecursive(const std::string& name, Node *parent);
-
-    SpriteNode* loadSprite(const std::string&name){
-        return this->loadSpriteRecursive(name, nullptr);
+    Asset* loadSpriteRecursive(const std::string& name, Asset *parent);
+    SpriteAsset* loadSprite(const std::string&name){
+        return dynamic_cast<SpriteAsset*>(this->loadSpriteRecursive(name, nullptr));
     }
 
+    std::vector<MissingAsset*> getMissingAssets();
+    std::vector<MalformedAsset*> getMalformedAssets();
 
-    Node* loadLevel(const File& file);
-    void checkLevel(const Level& level, Node* node);    
+    //std::string getHealthReport()const;
+
+    Asset* loadLevel(const File& file);
+       
 private:
-    Node* lookForAsset(std::string name, const std::string& dir, int type, Node * parent,
+    void checkLevel(const Level& level, Asset* node);
+
+    Asset* lookForAsset(std::string name, const std::string& dir, int type, Asset * parent,
     const std::string& color = "\x1B[0m");
 
-    std::vector<Node* > nodes;
+    std::vector<Asset* > assets;
 };
 
 }
