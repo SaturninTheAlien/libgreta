@@ -2,21 +2,24 @@
 
 local greta = require("greta")
 
-greta.SetAssetsPath( os.getenv("HOME") .. "/c++/pk2_greta")
-greta.SetEpisode("Debug Island", nil)
+local assetsPath = os.getenv("HOME") .. "/c++/pk2_greta"
+local episodeName = "Debug Island"
 
 
 function EpisodeTest()
-    local levelFiles = greta.SearchForLevels()
+    
 
-    -- print(#levelFiles)
+    local episode = greta.Episode.new(assetsPath, episodeName)
+    episode.debug = true
 
-    -- for i, file in ipairs(levelFiles) do
-    --     print(tostring(i) .. " -> " .. tostring(file))
-    -- end
+    local levelFiles = episode:searchForLevels()
 
-    local episode = greta.Episode.new()
-    episode.verbose = true
+    print(#levelFiles)
+
+    for i, file in ipairs(levelFiles) do
+        print(tostring(i) .. " -> " .. tostring(file))
+    end
+
 
     for _, file in ipairs(levelFiles) do
         episode:loadLevel(file)
@@ -24,27 +27,27 @@ function EpisodeTest()
 end
 
 
-function LevelTest()
-    local episode = greta.Episode.new()
-    episode.verbose = true
+-- function LevelTest()
+--     local episode = greta.Episode.new()
+--     episode.verbose = true
 
-    episode:loadLevel(
-        greta.File.new(
-            greta.GetAssetsPath() .. "/episodes/Debug Island/lua_cult.map"
-        )
-    )
-end
+--     episode:loadLevel(
+--         greta.File.new(
+--             greta.GetAssetsPath() .. "/episodes/Debug Island/lua_cult.map"
+--         )
+--     )
+-- end
 
 
-function SpriteTest()
-    local episode = greta.Episode.new()
-    episode.verbose = true
+-- function SpriteTest()
+--     local episode = greta.Episode.new()
+--     episode.verbose = true
 
-    local sprite = episode:loadSprite("dino.spr")
-    print(sprite)
-    print(sprite.prototype)
+--     local sprite = episode:loadSprite("dino.spr")
+--     print(sprite)
+--     print(sprite.prototype)
     
-end
+-- end
 
 if debug.getinfo(1).what=="main" then
     --SpriteTest()

@@ -1,5 +1,4 @@
 #include "episode.hpp"
-#include "files/pk2filesystem.hpp"
 #include "utils/string_utils.hpp"
 #include "sprite/sprite_io.hpp"
 #include "level/level_io.hpp"
@@ -20,12 +19,11 @@ Episode::~Episode(){
     this->nodes.clear();
 }
 
-
 Node* Episode::loadLevel(const File& file){
 
     Node * levelNode = new Node(file.getFilename(), ASSET_LEVEL, nullptr);
 
-    if(this->verbose){
+    if(this->debug){
         std::cout<<"Loading level: \x1B[93m\""<<file.getFilename()<<"\"\x1B[0m"<<std::endl;
     }
 
@@ -104,14 +102,14 @@ SpriteNode* Episode::loadSpriteRecursive(const std::string& name,Node *parent){
             }
         }
 
-        if(this->verbose){
+        if(this->debug){
             std::cout<<"Looking for: "<< "\x1B[32m\""<<name1<<"/.spr\"\x1B[0m"<<std::endl;
         }
 
-        std::optional<File> file = FindAsset(name1, SPRITES_DIR, ".spr");
+        std::optional<File> file = this->findAsset(name1, SPRITES_DIR, ".spr");
         if(!file.has_value()){
 
-            if(this->verbose){
+            if(this->debug){
                 std::cout<<"\x1B[31mSprite: \"" << name1<<"\" not found!\x1B[0m"<<std::endl;
             }
             this->nodes.emplace_back(
@@ -183,15 +181,15 @@ Node* Episode::lookForAsset(std::string name, const std::string& dir, int assetT
         }
     }
 
-    if(this->verbose){
+    if(this->debug){
         std::cout<< "Looking for: "<<color<<"\""<<name<<"\"\x1B[0m"<<std::endl;
     }
 
     Node* result = nullptr;
 
-    std::optional<File> file = FindAsset(name, dir);
+    std::optional<File> file = this->findAsset(name, dir, "");
     if(!file.has_value()){
-        if(this->verbose){
+        if(this->debug){
             std::cout<<"\x1B[31mFile: \""<<name<<"\" not found!\x1B[0m"<<std::endl;
         }
         result = new MissingAsset(name, assetType, parent);

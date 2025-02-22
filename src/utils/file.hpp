@@ -52,4 +52,6 @@ private:
     PZipEntry zip_entry;
 };
 
+std::vector<File> ScanDir(const std::string& dir, const std::string& filter);
+
 }

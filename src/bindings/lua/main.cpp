@@ -4,7 +4,7 @@
 #include "lua_misc.hpp"
 #include "lua_sprite.hpp"
 #include "lua_level.hpp"
-#include "lua_pk2files.hpp"
+#include "lua_files.hpp"
 #include "lua_episode.hpp"
 #include "lua_zip.hpp"
 

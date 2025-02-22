@@ -2,10 +2,11 @@
 
 #include <vector>
 #include <string>
+#include <filesystem>
 
+#include "episode_fs.hpp"
 #include "sprite/sprite.hpp"
 #include "level/level.hpp"
-#include "files/pk2filesystem.hpp"
 
 namespace libgreta{
 
@@ -97,10 +98,36 @@ protected:
     friend class Episode;
 };
 
-class GRETA_API Episode{
+class GRETA_API Episode: public EpisodeFS{
 public:
-    Episode()=default;
-    bool verbose = false;
+
+    Episode(const std::string& assetsPath,
+        const std::string& episodeName):
+    EpisodeFS(assetsPath, episodeName){
+
+    }
+
+    Episode(const std::string& assetsPath,
+        const std::string& episodeName,
+        PZip * zip):
+        EpisodeFS(assetsPath, episodeName, zip){
+        
+    }
+
+
+    explicit Episode(const EpisodeFS& fs):
+    EpisodeFS(fs){
+
+    }
+
+    //DO NOT COPY objects of this class!
+    Episode(const Episode& src)=delete;
+    Episode& operator=(const Episode& src) = delete;
+
+    ~Episode();
+
+
+    bool debug = false;
 
     SpriteNode* loadSpriteRecursive(const std::string& name, Node *parent);
 
@@ -110,15 +137,8 @@ public:
 
 
     Node* loadLevel(const File& file);
-    void checkLevel(const Level& level, Node* node);
-   
-    //DO NOT COPY objects of this class!
-    Episode(const Episode& src)=delete;
-    Episode& operator=(const Episode& src) = delete;
-
-    ~Episode();
+    void checkLevel(const Level& level, Node* node);    
 private:
-
     Node* lookForAsset(std::string name, const std::string& dir, int type, Node * parent,
     const std::string& color = "\x1B[0m");
 

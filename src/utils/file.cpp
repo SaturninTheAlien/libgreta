@@ -1,4 +1,4 @@
-#include "pk2file.hpp"
+#include "file.hpp"
 #include "utils/string_utils.hpp"
 #include <fstream>
 #include <filesystem>
@@ -103,6 +103,28 @@ std::vector<char> File::getContent()const{
     }
 
     return result;
+}
+
+
+std::vector<File> ScanDir(const std::string& dir, const std::string& filter){
+    std::vector<File> res;
+
+    for(const auto& entry: fs::directory_iterator(dir)){
+
+		if(entry.is_directory()){
+			if(filter == "/"){
+				res.emplace_back(File(entry.path().string()));
+			}
+		}
+		else{
+			if(filter.empty() || entry.path().extension().string() == filter){
+				res.emplace_back(File(entry.path().string()));
+			}
+
+		}
+    }
+
+    return res;
 }
 
 }

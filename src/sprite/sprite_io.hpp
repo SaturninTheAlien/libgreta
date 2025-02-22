@@ -1,7 +1,7 @@
 #pragma once
 #include "sprite.hpp"
 #include "utils/api.hpp"
-#include "files/pk2file.hpp"
+#include "utils/file.hpp"
 
 namespace libgreta{
 

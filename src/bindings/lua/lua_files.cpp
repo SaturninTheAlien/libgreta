@@ -1,17 +1,9 @@
-#include "lua_pk2files.hpp"
+#include "lua_files.hpp"
 
-#include "files/pk2file.hpp"
-#include "files/pk2filesystem.hpp"
+#include "utils/file.hpp"
 #include <optional>
 
 namespace libgreta{
-
-static std::optional<File> Lua_FindAsset1(
-    const std::string& name,
-    const std::string& default_dir){
-
-    return FindAsset(name, default_dir, "");
-}
 
 static std::string Lua_FileToStr(File* file){
     if(file->isZip()){
@@ -33,13 +25,7 @@ void ExposePK2FilesApi(sol::table& t){
     "getContentAsString", &File::getContentAsString,
     "__tostring", Lua_FileToStr);
 
-    t["SetAssetsPath"] = SetAssetsPath;
-    t["GetAssetsPath"] = GetAssetsPath;
-
-    t["SetEpisode"] = SetEpisode;
-    t["SearchForLevels"] = SearchForLevels;
-    t["SearchForZips"] = SearchForZips;
-    t["FindAsset"] = sol::overload(FindAsset, Lua_FindAsset1);
+    t["ScanDir"] = ScanDir;
 }
 
 }

@@ -1,19 +1,13 @@
 #!/usr/bin/env lua
 local greta = require("greta")
 
-greta.SetAssetsPath( os.getenv("HOME") .. "/c++/pk2_greta")
-greta.SetEpisode("Debug Island", nil)
+local assetsPath = os.getenv("HOME") .. "/c++/pk2_greta"
+local episodeName = "Debug Island"
 
-function FindTest()
-    print(greta.FindAsset("mune.spr2", "sprites"))
-    print(greta.FindAsset("missing1.spr", "sprites") == nil)
-
-    print(greta.FindAsset("PiG.SpR", "sprites", ".spr2"))
-
-end
+local fs = greta.EpisodeFS.new(assetsPath, episodeName)
 
 function LoadSprite(name)
-    local file = greta.FindAsset(name, "sprites", ".spr")
+    local file = fs:findAsset(name, "sprites", ".spr")
     if file == nil then
         print(name .. " not found!")
         return nil
@@ -31,16 +25,13 @@ function LoadSprite(name)
 
 end
 
-function LoadSpriteTest()
+function FSTest()
     LoadSprite("PiG.SpR2")
-    --LoadSprite("pig3.spr2")
-    --print("TEST")
     LoadSprite("pumpki1.spr")
 end
 
 if debug.getinfo(1).what=="main" then
-    LoadSpriteTest()
-    --FindTest()
+    FSTest()
 end
 
 

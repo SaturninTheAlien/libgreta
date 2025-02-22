@@ -25,12 +25,27 @@ void ExposeEpisode(sol::table& t){
     "transformation",&SpriteNode::transformation,
     "__tostring", Lua_SpriteNodeStr);
 
+    t.new_usertype<EpisodeFS>("EpisodeFS",
+        sol::constructors<
+        EpisodeFS(const std::string&, const std::string&, PZip*),
+        EpisodeFS(const std::string&, const std::string&)>(),
+        "getAssetsPath", &EpisodeFS::getAssetsPath,
+        "getEpisodePath", &EpisodeFS::getEpisodePath,
+        "findAsset", &EpisodeFS::findAsset,
+        "searchForLevels", &EpisodeFS::searchForLevels    
+    );
+
 
     t.new_usertype<Episode>("Episode",
-    "loadSprite", &Episode::loadSprite,
-    "verbose", &Episode::verbose,
-    "loadLevel", &Episode::loadLevel,
-    "checkLevel", Lua_EpisodeCheckLevel);
+    sol::constructors<
+        Episode(const std::string&, const std::string&, PZip*),
+        Episode(const std::string&, const std::string&)>(),
+        "loadSprite", &Episode::loadSprite,
+        "debug", &Episode::debug,
+        "loadLevel", &Episode::loadLevel,
+        "checkLevel", Lua_EpisodeCheckLevel,
+        sol::base_classes, sol::bases<EpisodeFS>()
+    );
 }
 
 }

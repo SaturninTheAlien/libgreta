@@ -1,9 +1,9 @@
-#include "pk2filesystem.hpp"
+#include <stdexcept>
+#include <sstream>
+#include "episode_fs.hpp"
 #include <filesystem>
 #include "utils/zip_utils.hpp"
 #include "utils/string_utils.hpp"
-
-//#include <iostream>
 
 namespace fs = std::filesystem;
 
@@ -25,46 +25,51 @@ const std::string MUSIC_DIR = "music";
 const std::string LUA_DIR = "lua";
 const std::string LIFE_DIR = "rle";
 
-static fs::path mAssetsPath;
-static fs::path mEpisodePath;
-static PZip* mEpisodeZip;
-
-bool SetAssetsPath(const std::string& name){
+static fs::path _fixAssetsPath(const std::string & name){
     fs::path p = name;
     fs::path p1 = p / "gfx" / "pk2stuff.bmp";
 
     if(fs::exists(p1)){
 
-        mAssetsPath = p;
-        return true;
+        return p;
+    }
+    p1 = p / "gfx" / "pk2stuff.png";
+    if(fs::exists(p1)){
+
+        return p;
     }
 
     fs::path p2 = p / "res" / "gfx" / "pk2stuff.bmp";
-    if(fs::exists(p2)){
-        mAssetsPath = p / "res";
-        return true;
+    fs::path p3 = p / "res" / "gfx" / "pk2stuff.png";
+
+    if(fs::exists(p2) || fs::exists(p3) ){
+        return p / "res";
     }
 
-    return false;
+    std::ostringstream os;
+    os<< "Incorrect assets path: "<<name<<std::endl;
+    throw std::runtime_error(os.str());
 }
 
-std::string GetAssetsPath(){
-    return mAssetsPath.string();
+
+EpisodeFS::EpisodeFS(const std::string& assetsPath, const std::string& episodePath)
+:assetsPath(_fixAssetsPath(assetsPath)), episodePath(fs::path(episodePath)){
+    if(!this->episodePath.is_absolute()){
+        this->episodePath = this->assetsPath / "episodes" / this->episodePath;
+    }
 }
 
-void SetEpisode(const std::string& episodeName, PZip* zip_file){
-    mEpisodeZip = zip_file;
-    if(zip_file==nullptr){
-        mEpisodePath = episodeName;
-        if(!mEpisodePath.is_absolute()){
-            mEpisodePath = mAssetsPath / "episodes" / mEpisodePath;
+EpisodeFS::EpisodeFS(const std::string& assetsPath, const std::string& episodeName, PZip* zip)
+:assetsPath(_fixAssetsPath(assetsPath)), episodePath(episodeName), zip(zip) {
+    if(zip==nullptr){
+        if(!this->episodePath.is_absolute()){
+            this->episodePath = this->assetsPath / "episodes" / this->episodePath;
         }
     }
     else{
-        mEpisodePath = fs::path("episodes") / episodeName;
+        this->episodePath = fs::path("episodes") / this->episodePath;
     }
 }
-
 
 /**
  * @brief 
@@ -107,13 +112,16 @@ static std::optional<std::string> FindFile(const fs::path& dir, const std::strin
 
 
 
-std::optional<File> FindVanillaAsset(const std::string& name, const std::string& default_dir, const std::string& alt_extension){
+std::optional<File> EpisodeFS::findVanillaAsset(const std::string& name,
+        const std::string& default_dir,
+        const std::string& alt_extension)const{
+
     std::string filename = fs::path(name).filename().string();
     /**
      * @brief 
      * sprites/pig.spr2
      */
-    std::optional<std::string> op = FindFile(mAssetsPath / default_dir, filename, alt_extension);
+    std::optional<std::string> op = FindFile(this->assetsPath / default_dir, filename, alt_extension);
     if(op.has_value()){
         return File(*op);
     }
@@ -122,11 +130,14 @@ std::optional<File> FindVanillaAsset(const std::string& name, const std::string&
 
 
 
-std::optional<File> FindEpisodeAsset(const std::string& name, const std::string& default_dir, const std::string& alt_extension){
+std::optional<File> EpisodeFS::findEpisodeAsset(const std::string& name,
+        const std::string& default_dir,
+        const std::string& alt_extension)const{
+
     std::string filename = fs::path(name).filename().string();
     if(filename.empty()) return {};
 
-    if(mEpisodeZip!=nullptr){
+    if(this->zip!=nullptr){
 
         std::optional<PZipEntry> entry;
         /**
@@ -134,27 +145,27 @@ std::optional<File> FindEpisodeAsset(const std::string& name, const std::string&
          * zip:/episodes/"episode"/pig.spr2
          */
 
-        entry = mEpisodeZip->getEntry( (mEpisodePath / filename).string(), alt_extension);
-        if(entry.has_value())return File(mEpisodeZip, *entry);
+        entry = zip->getEntry( (this->episodePath / filename).string(), alt_extension);
+        if(entry.has_value())return File(zip, *entry);
         
         /**
          * @brief 
          * zip:/sprites/pig.spr2
          */
         if(!default_dir.empty()){
-            entry = mEpisodeZip->getEntry((fs::path(default_dir)/filename).string(), alt_extension);
-            if(entry.has_value())return File(mEpisodeZip, *entry);
+            entry = zip->getEntry((fs::path(default_dir)/filename).string(), alt_extension);
+            if(entry.has_value())return File(zip, *entry);
         }
 
         
     }
     
-    else if(!mEpisodePath.empty()){
+    else if(! this->episodePath.empty()){
         /**
          * @brief 
          * episodes/"episode"/pig.spr2
          */
-        std::optional<std::string> op = FindFile(mEpisodePath, filename, alt_extension);
+        std::optional<std::string> op = FindFile(this->episodePath, filename, alt_extension);
         if(op.has_value()){
             return File(*op);
         }
@@ -164,7 +175,7 @@ std::optional<File> FindEpisodeAsset(const std::string& name, const std::string&
          * episodes/"episode"/sprites/pig.spr2
          */
         if(!default_dir.empty()){
-            op = FindFile(mEpisodePath / default_dir, filename, alt_extension);
+            op = FindFile(this->episodePath / default_dir, filename, alt_extension);
             if(op.has_value()){
                 return File(*op);
             }
@@ -174,7 +185,10 @@ std::optional<File> FindEpisodeAsset(const std::string& name, const std::string&
     return {};
 }
 
-std::optional<File> FindAsset(const std::string& name, const std::string& default_dir, const std::string& alt_extension){
+std::optional<File> EpisodeFS::findAsset(const std::string& name,
+        const std::string& default_dir,
+        const std::string& alt_extension)const{
+
     if(name.empty())return {};
 
     /**
@@ -183,10 +197,10 @@ std::optional<File> FindAsset(const std::string& name, const std::string& defaul
     fs::path p(name);
     if(p.is_absolute() && fs::exists(p) && !fs::is_directory(p))return File(name);
 
-    std::optional<File> op = FindEpisodeAsset(name, default_dir, alt_extension);
+    std::optional<File> op = this->findEpisodeAsset(name, default_dir, alt_extension);
     if(op.has_value())return op;
 
-    op = FindVanillaAsset(name, default_dir, alt_extension);
+    op = this->findVanillaAsset(name, default_dir, alt_extension);
     
     /*if(!op.has_value()){
         PLog::Write(PLog::WARN, "PFilesystem", "File \"%s\" not found!", name.c_str());
@@ -195,19 +209,18 @@ std::optional<File> FindAsset(const std::string& name, const std::string& defaul
     return op;
 }
 
-std::vector<File> SearchForLevels(){
+std::vector<File> EpisodeFS::searchForLevels(){
     std::vector<File> levels;
-    if(mEpisodeZip!=nullptr){
-        std::vector<PZipEntry> entries = mEpisodeZip->scanDirectory(mEpisodePath.string(), ".map");
+    if(this->zip!=nullptr){
+        std::vector<PZipEntry> entries = this->zip->scanDirectory(this->episodePath.string(), ".map");
         for(const PZipEntry& entry: entries){
 
-            levels.emplace_back(File(mEpisodeZip, entry));
+            levels.emplace_back(File(this->zip, entry));
 
         }
     }
     else{
-
-        for(const auto& entry: fs::directory_iterator(mEpisodePath)){
+        for(const auto& entry: fs::directory_iterator(this->episodePath)){
             if(!entry.is_directory()){
                 std::string extension = entry.path().extension().string();
                 if(extension==".map"){
@@ -218,21 +231,6 @@ std::vector<File> SearchForLevels(){
 
     }
     return levels;
-}
-
-std::vector<File> SearchForZips(){
-    std::vector<File> zips;
-
-    for(const auto& entry: fs::directory_iterator(mAssetsPath / "data" / "mapstore")){
-        if(!entry.is_directory()){
-            std::string extension = entry.path().extension().string();
-            if(extension==".zip"){
-                zips.emplace_back(File(entry.path().string()));
-            }            
-        }
-    }
-
-    return zips;
 }
 
 }
