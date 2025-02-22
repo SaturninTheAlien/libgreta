@@ -40,7 +40,7 @@ protected:
         filename(filename), type(type), parent(parent){
     }
 
-    friend class PK2Crawler;
+    friend class Episode;
 };
 
 class GRETA_API MissingAsset: public Node{
@@ -55,7 +55,7 @@ protected:
     Node(name, type, parent){
     }
 
-    friend class PK2Crawler;
+    friend class Episode;
 };
 
 class GRETA_API MalformedAsset: public Node{
@@ -71,7 +71,7 @@ protected:
     MalformedAsset(const std::string& name, int type, Node* parent, std::string msg):
         Node(name, type, parent), message(msg){
     }
-    friend class PK2Crawler;
+    friend class Episode;
 };
 
 class GRETA_API SpriteNode: public Node{
@@ -94,12 +94,12 @@ protected:
     Node(filename, ASSET_SPRITE, parent), prototype(proto){
         
     }
-    friend class PK2Crawler;
+    friend class Episode;
 };
 
-class GRETA_API PK2Crawler{
+class GRETA_API Episode{
 public:
-    PK2Crawler()=default;
+    Episode()=default;
     bool verbose = false;
 
     SpriteNode* loadSpriteRecursive(const std::string& name, Node *parent);
@@ -113,10 +113,10 @@ public:
     void checkLevel(const Level& level, Node* node);
    
     //DO NOT COPY objects of this class!
-    PK2Crawler(const PK2Crawler& src)=delete;
-    PK2Crawler& operator=(const PK2Crawler& src) = delete;
+    Episode(const Episode& src)=delete;
+    Episode& operator=(const Episode& src) = delete;
 
-    ~PK2Crawler();
+    ~Episode();
 private:
 
     Node* lookForAsset(std::string name, const std::string& dir, int type, Node * parent,

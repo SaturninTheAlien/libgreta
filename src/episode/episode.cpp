@@ -1,4 +1,4 @@
-#include "crawler.hpp"
+#include "episode.hpp"
 #include "files/pk2filesystem.hpp"
 #include "utils/string_utils.hpp"
 #include "sprite/sprite_io.hpp"
@@ -9,7 +9,7 @@
 
 namespace libgreta{
 
-PK2Crawler::~PK2Crawler(){
+Episode::~Episode(){
     for(Node*& proto:this->nodes){
         if(proto!=nullptr){
             delete proto;
@@ -21,7 +21,7 @@ PK2Crawler::~PK2Crawler(){
 }
 
 
-Node* PK2Crawler::loadLevel(const File& file){
+Node* Episode::loadLevel(const File& file){
 
     Node * levelNode = new Node(file.getFilename(), ASSET_LEVEL, nullptr);
 
@@ -37,7 +37,7 @@ Node* PK2Crawler::loadLevel(const File& file){
     return levelNode;
 }
 
-void PK2Crawler::checkLevel(const Level& level, Node * node){
+void Episode::checkLevel(const Level& level, Node * node){
 
     //Lua
     this->lookForAsset(level.lua_script,
@@ -83,7 +83,7 @@ void PK2Crawler::checkLevel(const Level& level, Node * node){
     }
 }
 
-SpriteNode* PK2Crawler::loadSpriteRecursive(const std::string& name,Node *parent){
+SpriteNode* Episode::loadSpriteRecursive(const std::string& name,Node *parent){
     try{
         if(name.empty()){
             return nullptr;
@@ -170,7 +170,7 @@ SpriteNode* PK2Crawler::loadSpriteRecursive(const std::string& name,Node *parent
     return nullptr;
 }
 
-Node* PK2Crawler::lookForAsset(std::string name, const std::string& dir, int assetType, Node * parent,
+Node* Episode::lookForAsset(std::string name, const std::string& dir, int assetType, Node * parent,
         const std::string& color){
     //
 

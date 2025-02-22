@@ -38,6 +38,7 @@ void ExposePK2FilesApi(sol::table& t){
 
     t["SetEpisode"] = SetEpisode;
     t["SearchForLevels"] = SearchForLevels;
+    t["SearchForZips"] = SearchForZips;
     t["FindAsset"] = sol::overload(FindAsset, Lua_FindAsset1);
 }
 

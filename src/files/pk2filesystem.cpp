@@ -220,4 +220,19 @@ std::vector<File> SearchForLevels(){
     return levels;
 }
 
+std::vector<File> SearchForZips(){
+    std::vector<File> zips;
+
+    for(const auto& entry: fs::directory_iterator(mAssetsPath / "data" / "mapstore")){
+        if(!entry.is_directory()){
+            std::string extension = entry.path().extension().string();
+            if(extension==".zip"){
+                zips.emplace_back(File(entry.path().string()));
+            }            
+        }
+    }
+
+    return zips;
+}
+
 }

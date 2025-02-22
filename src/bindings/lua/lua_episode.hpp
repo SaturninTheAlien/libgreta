@@ -3,6 +3,6 @@
 
 namespace libgreta{
 
-void ExposeCrawler(sol::table& t);
+void ExposeEpisode(sol::table& t);
 
 }
