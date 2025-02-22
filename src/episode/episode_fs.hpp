@@ -25,6 +25,21 @@ extern GRETA_API const std::string LUA_DIR;
 extern GRETA_API const std::string LIFE_DIR;
 
 
+enum{
+    ASSET_EPISODE_ROOT = -1,
+    ASSET_UNKNOWN = 0,
+    ASSET_LEVEL = 1,
+    ASSET_SPRITE = 2,
+    ASSET_SPRITE_TEXTURE = 3,
+    ASSET_SPRITE_SOUND = 4,
+    ASSET_TILESET = 5,
+    ASSET_SCENERY = 6,
+    ASSET_LUA = 7,
+    ASSET_GFX = 8
+};
+
+const std::string& GRETA_API getDefaultDirForAssetType(int type);
+
 class PZip;
 
 class GRETA_API EpisodeFS{

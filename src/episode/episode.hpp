@@ -10,19 +10,6 @@
 #include "level/level.hpp"
 
 namespace libgreta{
-
-enum{
-    ASSET_EPISODE_ROOT = -1,
-    ASSET_UNKNOWN = 0,
-    ASSET_LEVEL = 1,
-    ASSET_SPRITE = 2,
-    ASSET_SPRITE_TEXTURE = 3,
-    ASSET_SPRITE_SOUND = 4,
-    ASSET_TILESET = 5,
-    ASSET_SCENERY = 6,
-    ASSET_LUA = 7,
-    ASSET_GFX = 8
-};
 /**
  * @brief 
  * Tree-like structure
@@ -41,7 +28,6 @@ public:
     Asset* parent = nullptr;
 
     std::string getStackTrace()const;
-
 protected:
     Asset(const std::string& filename, int type, Asset* parent):
         filename(filename), type(type), parent(parent){

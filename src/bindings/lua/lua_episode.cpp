@@ -69,6 +69,8 @@ void ExposeEpisode(sol::table& t){
 
         sol::base_classes, sol::bases<EpisodeFS>()
     );
+
+    t["getDefaultDirForAssetType"] = getDefaultDirForAssetType;
 }
 
 }

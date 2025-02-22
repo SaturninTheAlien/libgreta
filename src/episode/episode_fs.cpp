@@ -25,6 +25,39 @@ const std::string MUSIC_DIR = "music";
 const std::string LUA_DIR = "lua";
 const std::string LIFE_DIR = "rle";
 
+
+const std::string& getDefaultDirForAssetType(int type){
+    switch (type)
+    {
+    case ASSET_EPISODE_ROOT:
+    case ASSET_UNKNOWN:
+    case ASSET_LEVEL:
+        return EPISODES_DIR;
+
+    case ASSET_SPRITE:
+    case ASSET_SPRITE_TEXTURE:
+    case ASSET_SPRITE_SOUND:
+        return SPRITES_DIR;
+
+    case ASSET_TILESET:
+        return TILES_DIR;
+
+    case ASSET_SCENERY:
+        return SCENERY_DIR;
+    case ASSET_LUA:
+        return LUA_DIR;
+    case ASSET_GFX:
+        return GFX_DIR;
+        
+    default:
+        break;
+        
+    }
+
+    return EPISODES_DIR;
+}
+
+
 static fs::path _fixAssetsPath(const std::string & name){
     fs::path p = name;
     fs::path p1 = p / "gfx" / "pk2stuff.bmp";
