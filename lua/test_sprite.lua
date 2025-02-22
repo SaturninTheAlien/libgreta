@@ -34,7 +34,7 @@ function DinoTest()
     greta.SaveJsonSprite(sprite, "test.json")
 end
 
-if debug.getinfo(1).what=="main" then
+if ... == nil then
     greta.Test()
     PigTest()
     DinoTest()

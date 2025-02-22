@@ -76,10 +76,16 @@ EpisodeTree::~EpisodeTree(){
 }
 
 
-void EpisodeTree::loadAllLevels(){
+int EpisodeTree::loadAllLevels(){
+
+    int res = 0;
+
     for(const File& file : this->searchForLevels()){
         this->loadLevel(file);
+        ++res;
     }
+
+    return res;
 }
 
 Asset* EpisodeTree::loadLevel(const File& file){

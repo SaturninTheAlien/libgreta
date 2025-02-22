@@ -30,7 +30,7 @@ function FSTest()
     LoadSprite("pumpki1.spr")
 end
 
-if debug.getinfo(1).what=="main" then
+if ... == nil then
     FSTest()
 end
 

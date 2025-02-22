@@ -147,7 +147,7 @@ public:
     //std::string getHealthReport()const;
 
     Asset* loadLevel(const File& file);
-    void loadAllLevels();
+    int loadAllLevels();
 
 private:    
     void checkLevel(const Level& level, Asset* node);

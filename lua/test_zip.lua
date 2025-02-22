@@ -40,7 +40,7 @@ function SagaTest()
     
 end
 
-if debug.getinfo(1).what=="main" then
+if ... == nil then
     --ListEpisodes()
     SagaTest()
 end

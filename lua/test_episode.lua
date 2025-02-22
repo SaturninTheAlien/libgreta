@@ -49,7 +49,7 @@ end
     
 -- end
 
-if debug.getinfo(1).what=="main" then
+if ... == nil then
     --SpriteTest()
     --LevelTest()
 

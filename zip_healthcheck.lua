@@ -5,21 +5,31 @@ local greta = require("greta")
 
 local resetColor = "\x1B[0m"
 
-local function zipHealthCheck(path)
+local function zipHealthCheck(path, verbose)
 
     if not greta.fs.is_absolute(path) then
         path = assetsPath .. "/res/data/mapstore/" .. path
     end
 
-    print("Checking zip file: "..path)
+    if verbose then
+        print("Checking zip file: "..path)
+    end
+
+    local res = {status = 0}
     local zip = greta.Zip.new(path)
     local zippedEpisodes = zip:findSubdirectories("episodes")
 
     if #zippedEpisodes == 0 then
-        print("No PK2 episodes in the zip!")
-        return
 
-    else
+        if verbose then
+            print("No PK2 episodes in the zip!") 
+        end
+
+        res.status = 1
+        return res
+
+    elseif verbose then
+
         print("Found "..tostring(#zippedEpisodes).." episodes")
         for i, epName in ipairs(zippedEpisodes) do
             print("["..tostring(i).."] \x1B[1;36m"..epName..resetColor)
@@ -30,16 +40,36 @@ local function zipHealthCheck(path)
     --episodeTree.debug = true
     for _, epName in ipairs(zippedEpisodes) do
         episodeTree:setEpisode(epName, zip)
-        episodeTree:loadAllLevels()
+
+        if episodeTree:loadAllLevels() == 0 then
+            res.status = 2;
+
+            if verbose then
+                print("\x1B[1;33mEpisode has no levels!" .. resetColor)
+            end
+
+            return res
+        end
     end
 
     local missingAssets = episodeTree:getMissingAssets()
     local malformedAssets = episodeTree:getMalformedAssets()
 
     if #missingAssets == 0 and #malformedAssets == 0 then
-        print("\x1B[0;92mEverything is alright!" .. resetColor)
+
+        if verbose then
+            print("\x1B[0;92mEverything is alright!" .. resetColor)
+        end
+        
+        res.status = 0
+        return res
     else
-        if #missingAssets > 0 then
+
+        res.status = 3
+        res.missing = missingAssets
+        res.malformed = malformedAssets
+
+        if verbose and #missingAssets > 0 then
             print("Missing assets: ")
 
             for _, asset in ipairs(missingAssets) do
@@ -48,27 +78,32 @@ local function zipHealthCheck(path)
             end
         end
 
-        if #malformedAssets > 0 then
+        if verbose and #malformedAssets > 0 then
             print("Malformed assets: ")
             for _, asset in ipairs(malformedAssets) do
                 print("\x1B[41m\x1B[1;33m" .. asset.filename .. resetColor)
+
+                print(asset.what)
+
                 print(asset:getStackTrace())
             end
         end
 
     end
 
+    return res
+
 end
 
 
-if debug.getinfo(1).what=="main" then
+if ... == nil then
     local episode = assetsPath .. "/res/data/mapstore/tm.zip"
 
     if #arg >= 1 then
         episode = arg[1]
     end
 
-    zipHealthCheck(episode)
+    zipHealthCheck(episode, true)
     
 end
 
