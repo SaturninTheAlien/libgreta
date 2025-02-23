@@ -34,7 +34,7 @@ end
 local function report(a)
 
     if #a.episodes > 0 then
-        print("Asset "..a.filename.."found in:")
+        print("Asset "..a.filename.." found in:")
         for _, episode in ipairs(a.episodes) do
             print(" -> " .. episode)
         end
@@ -44,7 +44,7 @@ local function report(a)
     
 end
 
-local function brute_search(_assets)
+local function mapstore_search(_assets, verbose)
 
     local assets = map(_assets, function (a)
         local obj = {
@@ -91,12 +91,14 @@ local function brute_search(_assets)
         end
     end
 
-
-    for _, value in ipairs(assets) do
-        --print(value)
-        value:report()
+    if verbose then
+        for _, value in ipairs(assets) do
+            --print(value)
+            value:report()
+        end 
     end
 
+    return assets
 end
 
 
@@ -115,9 +117,9 @@ if ... == nil then
         }
     }
 
-    brute_search(testAssets)
+    mapstore_search(testAssets, true)
 
 end
 
 
-return brute_search
+return mapstore_search
