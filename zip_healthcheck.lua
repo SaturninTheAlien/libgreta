@@ -96,15 +96,10 @@ local function zipHealthCheck(path, verbose)
 end
 
 
-if ... == nil then
-    local episode = assetsPath .. "/res/data/mapstore/tm.zip"
-
-    if #arg >= 1 then
-        episode = arg[1]
-    end
-
-    zipHealthCheck(episode, true)
-    
+local episode = "/home/saturnin/games/PK2/Rajdh n Kiolp Complete Saga/rajdh_n_kiolp_complete_saga_fixed.zip"
+if #arg >= 1 then
+    episode = arg[1]
+    print(episode)
 end
 
-return zipHealthCheck
+zipHealthCheck(episode, true)

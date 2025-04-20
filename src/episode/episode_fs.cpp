@@ -199,6 +199,18 @@ std::optional<File> EpisodeFS::findEpisodeAsset(const std::string& name,
 
         entry = zip->getEntry( (this->episodePath / filename).string(), alt_extension);
         if(entry.has_value())return File(zip, *entry);
+
+
+
+        /**
+         * @brief 
+         * zip:/episodes/"episode"/sprites/pig.spr2
+         */
+        if(!default_dir.empty()){
+            entry = zip->getEntry((this->episodePath / default_dir / filename).string(), alt_extension);
+            if(entry.has_value())return File(zip, *entry);
+        }
+
         
         /**
          * @brief 

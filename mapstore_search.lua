@@ -107,13 +107,18 @@ if ... == nil then
 
 
     local testAssets = {
+        -- 
+        -- {
+        --     filename = "tei.spr",
+        --     type = 2
+        -- }
         {
-            filename = "tertulio.spr",
+            filename = "bbtrea1.spr",
             type = 2
         },
         {
-            filename = "tei.spr",
-            type = 2
+            filename = "factory.bmp",
+            type = 6
         }
     }
 
