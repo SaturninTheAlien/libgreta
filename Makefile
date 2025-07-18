@@ -65,13 +65,15 @@ DEPENDENCIES_CORE := $(addsuffix .d, $(DEPENDENCIES_CORE))
 # Binary output:
 BIN_CORE = $(BIN_DIR)greta.so
 BIN_LUA = $(BIN_DIR)greta_lua.so
+BIN_PYTHON = $(BIN_DIR)py_greta.so
 
-
-all: core lua
+all: core lua python
 
 core: $(BIN_CORE)
 
 lua: $(BIN_LUA)
+
+python: $(BIN_PYTHON)
 
 
 ###########################
@@ -140,11 +142,64 @@ $(BUILD_DIR_LUA)%.o: $(SRC_LUA_DIR)%.cpp
 	@$(COMPILE_COMMAND_LUA) -MM -MT $@ -I$(SRC_CORE_DIR) -I$(SRC_LUA_DIR) $< > $(BUILD_DIR_LUA)$*.d
 ###########################
 
+
+BUILD_DIR_PYTHON = build/python/
+SRC_PYTHON_DIR = src/bindings/python/
+
+SRC_PYTHON  = *.cpp */*.cpp */*/*.cpp
+SRC_PYTHON := $(addprefix $(SRC_PYTHON_DIR), $(SRC_PYTHON))
+SRC_PYTHON := $(wildcard $(SRC_PYTHON))
+
+# Object files:
+OBJ_PYTHON := $(basename $(SRC_PYTHON))
+OBJ_PYTHON := $(subst $(SRC_PYTHON_DIR), ,$(OBJ_PYTHON))
+OBJ_PYTHON := $(addsuffix .o, $(OBJ_PYTHON))
+OBJ_PYTHON := $(addprefix $(BUILD_DIR_PYTHON), $(OBJ_PYTHON))
+
+# Dependency files:
+DEPENDENCIES_PYTHON := $(OBJ_PYTHON)
+DEPENDENCIES_PYTHON := $(basename $(DEPENDENCIES_PYTHON))
+DEPENDENCIES_PYTHON := $(addsuffix .d, $(DEPENDENCIES_PYTHON))
+
+
+# Warnings:
+CXXFLAGS_PYTHON += -Wall
+
+# Standart:
+CXXFLAGS_PYTHON += --std=c++17 -fPIC
+
+CXXFLAGS_PYTHON += $(shell pkg-config python3 --cflags)
+# LDFLAGS_PYTHON += $(shell pkg-config python3 --libs)
+# Compiling to dll
+LDFLAGS_PYTHON += -shared -Wl,-rpath,'$$ORIGIN'
+
+COMPILE_COMMAND_PYTHON = $(CXX) $(CXXFLAGS_PYTHON)
+
+###########################
+$(BIN_PYTHON): $(OBJ_PYTHON) $(BIN_CORE)
+	@echo -Linking libgreta_python
+	@mkdir -p $(dir $@) >/dev/null
+	@$(CXX) $^ $(LDFLAGS_PYTHON) $(BIN_CORE) -o $@
+
+###########################
+-include $(DEPENDENCIES_PYTHON)
+
+$(BUILD_DIR_PYTHON)%.o: $(SRC_PYTHON_DIR)%.cpp
+	@echo -Compiling $<
+	@mkdir -p $(dir $@) >/dev/null
+	@$(COMPILE_COMMAND_PYTHON) -I$(SRC_CORE_DIR) -I$(SRC_PYTHON_DIR) -o $@ -c $<
+	@$(COMPILE_COMMAND_PYTHON) -MM -MT $@ -I$(SRC_CORE_DIR) -I$(SRC_PYTHON_DIR) $< > $(BUILD_DIR_PYTHON)$*.d
+###########################
+
+
+
 clean:
 	@rm -rf $(BIN_CORE)
 	@rm -rf $(BIN_LUA)
 	@rm -rf $(BUILD_DIR_CORE)
 	@rm -rf $(BUILD_DIR_LUA)
+	@rm -rf $(BUILD_DIR_PYTHON)
+	@em -rf $(BIN_PYTHON)
 
 test:
 	@echo $(CXXFLAGS)
