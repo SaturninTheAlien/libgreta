@@ -1,3 +1,4 @@
+#include <pybind11/stl.h>
 #include "py_level.hpp"
 
 #include "level/level.hpp"

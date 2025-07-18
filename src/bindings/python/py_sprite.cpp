@@ -1,3 +1,4 @@
+#include <pybind11/stl.h>
 #include <pybind11/pybind11.h>
 #include "sprite/sprite.hpp"
 #include "sprite/sprite_io.hpp"

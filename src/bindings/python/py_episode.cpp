@@ -1,3 +1,4 @@
+#include <pybind11/stl.h>
 #include "py_episode.hpp"
 
 #include "episode/episode.hpp"
