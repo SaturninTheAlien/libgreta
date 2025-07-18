@@ -86,6 +86,9 @@ void ExposeSpritePrototype(sol::table& t){
     "dead_weight", &SpritePrototype::dead_weight,
     "attack1_offset", &SpritePrototype::attack1_offset,
     "attack2_offset", &SpritePrototype::attack2_offset,
+    "player_detection", &SpritePrototype::player_detection,
+    "blend_mode", &SpritePrototype::blend_mode,
+    "blend_alpha", &SpritePrototype::blend_alpha,
     "__tostring", Lua_ProtoToString);
 }
 

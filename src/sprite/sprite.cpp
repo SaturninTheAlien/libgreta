@@ -482,6 +482,16 @@ SpritePrototype::SpritePrototype(const nlohmann::json& j){
 	if(j.contains("attack2_offset") && !j["attack2_offset"].is_null()){
 		this->attack2_offset = j["attack2_offset"].get<Point2D>();
 	}
+
+	if(j.contains("player_detection")){
+		this->player_detection = j["player_detection"].get<Point2D>();
+	}
+
+	/**
+	 * Experimental
+	 */
+	jsonReadInt(j, "blend_mode", this->blend_mode);
+	jsonReadInt(j, "blend_alpha", this->blend_alpha);
 }
 
 void to_json(nlohmann::json& j, const SpritePrototype& c){
@@ -603,6 +613,15 @@ void to_json(nlohmann::json& j, const SpritePrototype& c){
 
 	if(c.attack2_offset.has_value()){
 		j["attack2_offset"] = *c.attack2_offset;
+	}
+
+	if(c.player_detection.has_value()){
+		j["player_detection"] = *c.player_detection;
+	}
+
+	if(c.blend_mode!=0){
+		j["blend_mode"] = c.blend_mode;
+		j["blend_alpha"] = c.blend_alpha;
 	}
 }
 

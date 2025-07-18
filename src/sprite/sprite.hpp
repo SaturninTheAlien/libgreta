@@ -155,6 +155,10 @@ public:
     
     bool has_dead_weight = false;
     double  dead_weight = 0;
+
+    std::optional<Point2D> player_detection;
+    int blend_mode = 0;
+    int blend_alpha = 50;
 protected:
     nlohmann::json commands_json;
        
