@@ -5,7 +5,7 @@ A script to find sprites and other assets
 
 ]]
 
-local greta = require("greta")
+local greta = require("greta_lua")
 
 
 local assetsPath = os.getenv("HOME") .. "/c++/pk2_greta"

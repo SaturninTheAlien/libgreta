@@ -4,7 +4,7 @@
 A script to find sprites to the new format
 ]]
 
-local greta = require("greta")
+local greta = require("greta_lua")
 
 local function endswith(str, suffix)
     return str:sub(-#suffix) == suffix

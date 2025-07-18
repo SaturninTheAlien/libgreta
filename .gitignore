@@ -17,3 +17,6 @@ test.lua
 test.cpp
 
 *.DS_Store
+
+convert.py
+

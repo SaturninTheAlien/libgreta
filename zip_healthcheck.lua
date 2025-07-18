@@ -1,7 +1,7 @@
 #!/usr/bin/env lua
 
 local assetsPath = os.getenv("HOME") .. "/c++/pk2_greta"
-local greta = require("greta")
+local greta = require("greta_lua")
 
 local resetColor = "\x1B[0m"
 

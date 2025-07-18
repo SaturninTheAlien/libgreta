@@ -1,6 +1,6 @@
 #!/usr/bin/env lua
 
-local greta = require("greta")
+local greta = require("greta_lua")
 local mapstore_dir = "/home/saturnin/games/PK2/PK2_mapstore/old_not_repacked"
 
 local target_good_zips = "/home/saturnin/games/PK2/PK2_mapstore/good"

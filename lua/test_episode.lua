@@ -1,6 +1,6 @@
 #!/usr/bin/env lua
 
-local greta = require("greta")
+local greta = require("greta_lua")
 
 local assetsPath = os.getenv("HOME") .. "/c++/pk2_greta"
 local episodeName = "Debug Island"

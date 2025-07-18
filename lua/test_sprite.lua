@@ -1,6 +1,6 @@
 #!/usr/bin/env lua
 
-local greta = require("greta")
+local greta = require("greta_lua")
 
 function PigTest()
     local sprite = greta.LoadLegacySprite(os.getenv("HOME") .. "/c++/pk2_greta/res/episodes/Debug Island/sprites/flyp2.spr")

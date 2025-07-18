@@ -23,7 +23,7 @@ UNAME_S = $(shell uname -s)
 ifdef DEBUG
 $(info ->Debugging symbols enabled) 
     CXXFLAGS += -g
-	LDFLAGS += $(shell pkg-config libzip lua --libs)
+	LDFLAGS += $(shell pkg-config libzip --libs)
 	BIN_DIR = bin/
 else
 $(info ->Release mode)
@@ -34,58 +34,119 @@ $(info ->Release mode)
 endif
 
 
-CXXFLAGS += $(shell pkg-config libzip lua --cflags)
+CXXFLAGS += $(shell pkg-config libzip --cflags)
 LDFLAGS += $(shell pkg-config libzip --libs)
 
-COMPILE_COMMAND = $(CXX) $(CXXFLAGS)
+COMPILE_COMMAND_CORE = $(CXX) $(CXXFLAGS)
 
 # Directories:
-SRC_DIR = src/
+SRC_CORE_DIR = src/core/
 
-BUILD_DIR = build/
+BUILD_DIR_CORE = build/
 
 # Source files:
-SRC  = *.cpp */*.cpp */*/*.cpp
-SRC := $(addprefix $(SRC_DIR), $(SRC))
-SRC := $(wildcard $(SRC))
+SRC_CORE  = *.cpp */*.cpp */*/*.cpp
+SRC_CORE := $(addprefix $(SRC_CORE_DIR), $(SRC_CORE))
+SRC_CORE := $(wildcard $(SRC_CORE))
 
 # Object files:
-OBJ := $(basename $(SRC))
-OBJ := $(subst $(SRC_DIR), ,$(OBJ))
-OBJ := $(addsuffix .o, $(OBJ))
-OBJ := $(addprefix $(BUILD_DIR), $(OBJ))
+OBJ_CORE := $(basename $(SRC_CORE))
+OBJ_CORE := $(subst $(SRC_CORE_DIR), ,$(OBJ_CORE))
+OBJ_CORE := $(addsuffix .o, $(OBJ_CORE))
+OBJ_CORE := $(addprefix $(BUILD_DIR_CORE), $(OBJ_CORE))
 
 # Dependency files:
-DEPENDENCIES := $(OBJ)
-DEPENDENCIES := $(basename $(DEPENDENCIES))
-DEPENDENCIES := $(addsuffix .d, $(DEPENDENCIES))
+DEPENDENCIES_CORE := $(OBJ_CORE)
+DEPENDENCIES_CORE := $(basename $(DEPENDENCIES_CORE))
+DEPENDENCIES_CORE := $(addsuffix .d, $(DEPENDENCIES_CORE))
+
+
 
 # Binary output:
-BIN = $(BIN_DIR)greta.so
+BIN_CORE = $(BIN_DIR)greta.so
+BIN_LUA = $(BIN_DIR)greta_lua.so
 
-all: $(BIN)
+
+all: core lua
+
+core: $(BIN_CORE)
+
+lua: $(BIN_LUA)
+
 
 ###########################
-$(BIN): $(OBJ)
+$(BIN_CORE): $(OBJ_CORE)
 	@echo -Linking libgreta
 	@mkdir -p $(dir $@) >/dev/null
 	@$(CXX) $^ $(LDFLAGS) -o $@
 
 ###########################
--include $(DEPENDENCIES)
+-include $(DEPENDENCIES_CORE)
 
-$(BUILD_DIR)%.o: $(SRC_DIR)%.cpp
+$(BUILD_DIR_CORE)%.o: $(SRC_CORE_DIR)%.cpp
 	@echo -Compiling $<
 	@mkdir -p $(dir $@) >/dev/null
-	@$(COMPILE_COMMAND) -I$(SRC_DIR) -o $@ -c $<
-	@$(COMPILE_COMMAND) -MM -MT $@ -I$(SRC_DIR) $< > $(BUILD_DIR)$*.d
+	@$(COMPILE_COMMAND_CORE) -I$(SRC_CORE_DIR) -o $@ -c $<
+	@$(COMPILE_COMMAND_CORE) -MM -MT $@ -I$(SRC_CORE_DIR) $< > $(BUILD_DIR_CORE)$*.d
+###########################
+
+
+
+BUILD_DIR_LUA = build/lua/
+SRC_LUA_DIR = src/bindings/lua/
+
+SRC_LUA  = *.cpp */*.cpp */*/*.cpp
+SRC_LUA := $(addprefix $(SRC_LUA_DIR), $(SRC_LUA))
+SRC_LUA := $(wildcard $(SRC_LUA))
+
+# Object files:
+OBJ_LUA := $(basename $(SRC_LUA))
+OBJ_LUA := $(subst $(SRC_LUA_DIR), ,$(OBJ_LUA))
+OBJ_LUA := $(addsuffix .o, $(OBJ_LUA))
+OBJ_LUA := $(addprefix $(BUILD_DIR_LUA), $(OBJ_LUA))
+
+# Dependency files:
+DEPENDENCIES_LUA := $(OBJ_LUA)
+DEPENDENCIES_LUA := $(basename $(DEPENDENCIES_LUA))
+DEPENDENCIES_LUA := $(addsuffix .d, $(DEPENDENCIES_LUA))
+
+
+# Warnings:
+CXXFLAGS_LUA += -Wall
+
+# Standart:
+CXXFLAGS_LUA += --std=c++17 -fPIC
+
+CXXFLAGS_LUA += $(shell pkg-config lua --cflags)
+LDFLAGS_LUA += $(shell pkg-config lua --libs)
+# Compiling to dll
+LDFLAGS_LUA += -shared -Wl,-rpath,'$$ORIGIN'
+
+COMPILE_COMMAND_LUA = $(CXX) $(CXXFLAGS_LUA)
+
+###########################
+$(BIN_LUA): $(OBJ_LUA) $(BIN_CORE)
+	@echo -Linking libgreta_lua
+	@mkdir -p $(dir $@) >/dev/null
+	@$(CXX) $^ $(LDFLAGS_LUA) $(BIN_CORE) -o $@
+
+###########################
+-include $(DEPENDENCIES_LUA)
+
+$(BUILD_DIR_LUA)%.o: $(SRC_LUA_DIR)%.cpp
+	@echo -Compiling $<
+	@mkdir -p $(dir $@) >/dev/null
+	@$(COMPILE_COMMAND_LUA) -I$(SRC_CORE_DIR) -I$(SRC_LUA_DIR) -o $@ -c $<
+	@$(COMPILE_COMMAND_LUA) -MM -MT $@ -I$(SRC_CORE_DIR) -I$(SRC_LUA_DIR) $< > $(BUILD_DIR_LUA)$*.d
 ###########################
 
 clean:
-	@rm -rf $(BIN)
-	@rm -rf $(BUILD_DIR)
+	@rm -rf $(BIN_CORE)
+	@rm -rf $(BIN_LUA)
+	@rm -rf $(BUILD_DIR_CORE)
+	@rm -rf $(BUILD_DIR_LUA)
 
 test:
 	@echo $(CXXFLAGS)
 
-.PHONY: all clean test
+.PHONY: all core lua python clean test

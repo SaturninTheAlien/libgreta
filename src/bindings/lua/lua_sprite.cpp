@@ -1,6 +1,6 @@
 #include "lua_sprite.hpp"
-#include "../../sprite/sprite.hpp"
-#include "../../sprite/sprite_io.hpp"
+#include "sprite/sprite.hpp"
+#include "sprite/sprite_io.hpp"
 #include <string>
 
 

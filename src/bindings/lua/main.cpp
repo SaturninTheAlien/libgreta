@@ -1,5 +1,5 @@
 #include "3rd_party/sol.hpp"
-#include "../../utils/api.hpp"
+#include "utils/api.hpp"
 
 #include "lua_misc.hpp"
 #include "lua_sprite.hpp"
@@ -11,7 +11,6 @@
 #include <iostream>
 
 namespace libgreta{
-
 
 void Test(){
 	std::cout<<"Hello world from c++!"<<std::endl;
@@ -43,10 +42,9 @@ sol::table open_libgreta(sol::this_state L) {
 	return module;
 }
 
-
 }
 
-extern "C" int GRETA_API luaopen_greta(lua_State* L) {
+extern "C" int GRETA_API luaopen_greta_lua(lua_State* L) {
     return sol::stack::call_lua(
 	     L, 1, libgreta::open_libgreta);
 }
